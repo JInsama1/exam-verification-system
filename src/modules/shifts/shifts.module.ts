@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from '../auth/auth.module';
 
 
 import { Shift } from '../../database/entities/shift.entity';
@@ -14,18 +14,14 @@ import { ShiftsController } from './shifts.controller';
 @Module({
   imports: [
 
-    TypeOrmModule.forFeature([
-      Shift,
-      Exam,
-    ]),
+  TypeOrmModule.forFeature([
+  Shift,
+  Exam,
+]),
 
+  AuthModule,
 
-    JwtModule.register({
-      secret:
-        'exam_verification_super_secret_2026',
-    }),
-
-  ],
+],
 
 
   controllers: [

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from '../auth/auth.module';
 
 
 import { Attendance } from '../../database/entities/attendance.entity';
@@ -17,20 +17,16 @@ import { AttendanceController } from './attendance.controller';
 @Module({
   imports: [
 
-    TypeOrmModule.forFeature([
-      Attendance,
-      Candidate,
-      Operator,
-      Device,
-    ]),
+  TypeOrmModule.forFeature([
+  Attendance,
+  Candidate,
+  Operator,
+  Device,
+]),
 
+  AuthModule,
 
-    JwtModule.register({
-      secret:
-        'exam_verification_super_secret_2026',
-    }),
-
-  ],
+],
 
 
   controllers: [

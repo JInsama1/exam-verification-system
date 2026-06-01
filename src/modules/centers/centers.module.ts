@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from '../auth/auth.module';
+
 
 import { Center } from '../../database/entities/center.entity';
 
@@ -9,15 +10,12 @@ import { CentersController } from './centers.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Center,
-    ]),
+  TypeOrmModule.forFeature([
+    Center,
+  ]),
 
-    JwtModule.register({
-      secret:
-        'exam_verification_super_secret_2026',
-    }),
-  ],
+  AuthModule,
+],
 
   controllers: [
     CentersController,

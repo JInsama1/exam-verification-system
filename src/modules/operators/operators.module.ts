@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
+
+
+import { AuthModule } from '../auth/auth.module';
 
 
 import { Operator } from '../../database/entities/operator.entity';
@@ -12,7 +14,9 @@ import { OperatorsService } from './operators.service';
 import { OperatorsController } from './operators.controller';
 
 
+
 @Module({
+
   imports: [
 
     TypeOrmModule.forFeature([
@@ -21,10 +25,8 @@ import { OperatorsController } from './operators.controller';
       Center,
     ]),
 
-    JwtModule.register({
-      secret:
-        'exam_verification_super_secret_2026',
-    }),
+
+    AuthModule,
 
   ],
 
@@ -37,5 +39,6 @@ import { OperatorsController } from './operators.controller';
   providers: [
     OperatorsService,
   ],
+
 })
 export class OperatorsModule {}
