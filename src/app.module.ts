@@ -17,6 +17,8 @@ import { ShiftsModule } from './modules/shifts/shifts.module';
 import { Shift } from './database/entities/shift.entity';
 import { CandidatesModule } from './modules/candidates/candidates.module';
 import { Candidate } from './database/entities/candidate.entity';
+import { AttendanceModule } from './modules/attendance/attendance.module';
+import { Attendance } from './database/entities/attendance.entity';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { Candidate } from './database/entities/candidate.entity';
   Exam,
   Shift,
   Candidate,
+  Attendance,
 ],
     }),
 
@@ -52,6 +55,8 @@ import { Candidate } from './database/entities/candidate.entity';
     ShiftsModule,
 
     CandidatesModule,
+
+    AttendanceModule,
   ],
 })
 export class AppModule {}
