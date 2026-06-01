@@ -7,6 +7,8 @@ import { User } from './database/entities/user.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CentersModule } from './modules/centers/centers.module';
+import { Operator } from './database/entities/operator.entity';
+import { OperatorsModule } from './modules/operators/operators.module';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { CentersModule } from './modules/centers/centers.module';
       entities: [
   User,
   Center,
+  Operator,
 ],
     }),
 
@@ -27,6 +30,8 @@ import { CentersModule } from './modules/centers/centers.module';
     UsersModule,
 
     CentersModule,
+
+    OperatorsModule,
   ],
 })
 export class AppModule {}
