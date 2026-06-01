@@ -19,6 +19,7 @@ import { CandidatesModule } from './modules/candidates/candidates.module';
 import { Candidate } from './database/entities/candidate.entity';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { Attendance } from './database/entities/attendance.entity';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -57,6 +58,8 @@ import { Attendance } from './database/entities/attendance.entity';
     CandidatesModule,
 
     AttendanceModule,
+
+    ReportsModule,
   ],
 })
 export class AppModule {}

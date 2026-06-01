@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 
 
@@ -60,12 +61,14 @@ export class AttendanceService {
       });
 
 
+
     const operator =
       await this.operatorRepository.findOne({
         where: {
           id: dto.operatorId,
         },
       });
+
 
 
     const device =
@@ -91,12 +94,39 @@ export class AttendanceService {
 
 
 
+    const existingAttendance =
+      await this.attendanceRepository.findOne({
+
+        where: {
+
+          candidate: {
+            id: candidate.id,
+          },
+
+        },
+
+      });
+
+
+
+    if (existingAttendance) {
+
+      throw new ConflictException(
+        'Candidate already verified',
+      );
+
+    }
+
+
+
+
     candidate.verified = true;
 
 
     await this.candidateRepository.save(
       candidate,
     );
+
 
 
 
@@ -117,6 +147,7 @@ export class AttendanceService {
 
 
 
+
     return this.attendanceRepository.save(
       attendance,
     );
@@ -128,13 +159,21 @@ export class AttendanceService {
 
   findAll() {
 
+
     return this.attendanceRepository.find({
+
       relations: {
+
         candidate: true,
+
         operator: true,
+
         device: true,
+
       },
+
     });
+
 
   }
 
