@@ -12,6 +12,10 @@ export default function Candidates() {
   const [shifts, setShifts] = useState<any[]>([]);
   const [centers, setCenters] = useState<any[]>([]);
 
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const [search, setSearch] = useState("");
+
   const [file, setFile] = useState<File | null>(null);
   const [importResult, setImportResult] = useState<any>(null);
 
@@ -31,6 +35,7 @@ export default function Candidates() {
 
 
 
+
   const loadData = async () => {
 
     const [
@@ -40,20 +45,38 @@ export default function Candidates() {
       centersRes,
     ] = await Promise.all([
 
-      api.get("/candidates"),
+      api.get(
+        `/candidates?page=${page}&search=${search}`,
+      ),
+
       api.get("/exams"),
+
       api.get("/shifts"),
+
       api.get("/centers"),
 
     ]);
 
 
-    setCandidates(candidatesRes.data);
+    setCandidates(
+      candidatesRes.data.data,
+    );
+
+
+    setPages(
+      candidatesRes.data.pages,
+    );
+
+
     setExams(examsRes.data);
+
     setShifts(shiftsRes.data);
+
     setCenters(centersRes.data);
 
   };
+
+
 
 
 
@@ -61,7 +84,10 @@ export default function Candidates() {
 
     loadData();
 
-  }, []);
+  }, [page]);
+
+
+
 
 
 
@@ -89,6 +115,9 @@ export default function Candidates() {
     await loadData();
 
   };
+
+
+
 
 
 
@@ -129,6 +158,7 @@ export default function Candidates() {
 
 
 
+
   const uploadPhoto =
     async (candidateId: string) => {
 
@@ -140,17 +170,14 @@ export default function Candidates() {
       if (!photo) return;
 
 
-
       const formData =
         new FormData();
-
 
 
       formData.append(
         "file",
         photo,
       );
-
 
 
       await api.post(
@@ -162,11 +189,12 @@ export default function Candidates() {
       );
 
 
-
       await loadData();
 
-
     };
+
+
+
 
 
 
@@ -176,7 +204,6 @@ export default function Candidates() {
   return (
 
     <div className="flex">
-
 
       <Sidebar />
 
@@ -189,6 +216,56 @@ export default function Candidates() {
           Candidates
 
         </h1>
+
+
+
+
+
+
+        <div className="mb-6">
+
+
+          <input
+
+            className="border p-2"
+
+            placeholder="Search roll/name"
+
+            value={search}
+
+            onChange={
+              e =>
+                setSearch(
+                  e.target.value,
+                )
+            }
+
+          />
+
+
+
+          <button
+
+            className="border p-2 ml-2"
+
+            onClick={() => {
+
+              setPage(1);
+
+              loadData();
+
+            }}
+
+          >
+
+            Search
+
+          </button>
+
+
+        </div>
+
+
 
 
 
@@ -237,14 +314,15 @@ export default function Candidates() {
           </button>
 
 
-
           {
             importResult && (
 
               <p>
 
                 Imported: {importResult.imported}
+
                 {" | "}
+
                 Skipped: {importResult.skipped}
 
               </p>
@@ -255,191 +333,6 @@ export default function Candidates() {
 
         </div>
 
-
-
-
-
-
-
-
-        <div className="grid grid-cols-7 gap-2 mb-8">
-
-
-          <input
-            className="border p-2"
-            placeholder="Roll"
-            value={form.rollNumber}
-            onChange={e =>
-              setForm({
-                ...form,
-                rollNumber:e.target.value,
-              })
-            }
-          />
-
-
-
-          <input
-            className="border p-2"
-            placeholder="Name"
-            value={form.name}
-            onChange={e =>
-              setForm({
-                ...form,
-                name:e.target.value,
-              })
-            }
-          />
-
-
-
-
-          <select
-
-            className="border p-2"
-
-            value={form.examId}
-
-            onChange={e =>
-              setForm({
-                ...form,
-                examId:e.target.value,
-              })
-            }
-
-          >
-
-
-            <option value="">
-              Exam
-            </option>
-
-
-            {
-              exams.map(exam =>
-
-                <option
-                  key={exam.id}
-                  value={exam.id}
-                >
-
-                  {exam.name}
-
-                </option>
-
-              )
-            }
-
-
-          </select>
-
-
-
-
-
-
-          <select
-
-            className="border p-2"
-
-            value={form.shiftId}
-
-            onChange={e =>
-              setForm({
-                ...form,
-                shiftId:e.target.value,
-              })
-            }
-
-          >
-
-
-            <option value="">
-              Shift
-            </option>
-
-
-            {
-              shifts.map(shift =>
-
-                <option
-                  key={shift.id}
-                  value={shift.id}
-                >
-
-                  {shift.name}
-
-                </option>
-
-              )
-            }
-
-
-          </select>
-
-
-
-
-
-
-          <select
-
-            className="border p-2"
-
-            value={form.centerId}
-
-            onChange={e =>
-              setForm({
-                ...form,
-                centerId:e.target.value,
-              })
-            }
-
-          >
-
-
-            <option value="">
-              Center
-            </option>
-
-
-            {
-              centers.map(center =>
-
-                <option
-                  key={center.id}
-                  value={center.id}
-                >
-
-                  {center.name}
-
-                </option>
-
-              )
-            }
-
-
-          </select>
-
-
-
-
-
-
-          <button
-
-            className="border p-2 font-bold"
-
-            onClick={createCandidate}
-
-          >
-
-            Create
-
-          </button>
-
-
-        </div>
 
 
 
@@ -466,7 +359,6 @@ export default function Candidates() {
 
 
                     {
-
                       c.photoUrl && (
 
                         <img
@@ -481,13 +373,10 @@ export default function Candidates() {
                         />
 
                       )
-
                     }
 
 
                   </td>
-
-
 
 
 
@@ -498,14 +387,11 @@ export default function Candidates() {
                   </td>
 
 
-
-
                   <td className="border p-2">
 
                     {c.name}
 
                   </td>
-
 
 
 
@@ -542,9 +428,7 @@ export default function Candidates() {
 
                       onClick={
                         () =>
-                          uploadPhoto(
-                            c.id,
-                          )
+                          uploadPhoto(c.id)
                       }
 
                     >
@@ -562,23 +446,16 @@ export default function Candidates() {
 
                   <td className="border p-2">
 
-
                     {
-
                       c.verified
-
                         ? "Verified"
-
                         : "Pending"
-
                     }
-
 
                   </td>
 
 
                 </tr>
-
 
               ))
 
@@ -589,6 +466,66 @@ export default function Candidates() {
 
 
         </table>
+
+
+
+
+
+
+
+
+        <div className="mt-5">
+
+
+          <button
+
+            className="border p-2"
+
+            disabled={page === 1}
+
+            onClick={
+              () =>
+                setPage(page - 1)
+            }
+
+          >
+
+            Previous
+
+          </button>
+
+
+
+
+          <span className="mx-5">
+
+            {page} / {pages}
+
+          </span>
+
+
+
+
+
+          <button
+
+            className="border p-2"
+
+            disabled={page === pages}
+
+            onClick={
+              () =>
+                setPage(page + 1)
+            }
+
+          >
+
+            Next
+
+          </button>
+
+
+        </div>
 
 
       </main>
