@@ -50,7 +50,13 @@ export default function Attendance() {
     });
 
 
+const selectedCandidate =
+  candidates.find(
 
+    c =>
+      c.id === form.candidateId,
+
+  );
 
 
 
@@ -278,7 +284,78 @@ export default function Attendance() {
           </select>
 
 
+{
 
+  selectedCandidate && (
+
+    <div className="border p-4 mb-8">
+
+
+      {
+
+        selectedCandidate.photoUrl && (
+
+          <img
+
+            src={
+              "http://localhost:3000" +
+              selectedCandidate.photoUrl
+            }
+
+            className="w-40 h-40 object-cover mb-4"
+
+          />
+
+        )
+
+      }
+
+
+
+      <p>
+
+        Name:
+
+        {selectedCandidate.name}
+
+      </p>
+
+
+
+      <p>
+
+        Roll:
+
+        {selectedCandidate.rollNumber}
+
+      </p>
+
+
+
+      <p>
+
+        Exam:
+
+        {selectedCandidate.exam?.name}
+
+      </p>
+
+
+
+      <p>
+
+        Center:
+
+        {selectedCandidate.center?.name}
+
+      </p>
+
+
+    </div>
+
+  )
+
+}
 
 
 
