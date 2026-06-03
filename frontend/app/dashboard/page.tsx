@@ -8,7 +8,7 @@ import {
 
 
 import axios from "axios";
-
+import Sidebar from "../../components/Sidebar";
 
 
 export default function Dashboard() {
@@ -86,7 +86,13 @@ export default function Dashboard() {
 
   return (
 
-    <main className="p-10">
+  <div className="flex">
+
+
+    <Sidebar />
+
+
+    <main className="p-10 flex-1">
 
 
       <h1 className="text-3xl font-bold mb-8">
@@ -137,6 +143,8 @@ export default function Dashboard() {
 
 
     </main>
+
+</div>
 
   );
 
