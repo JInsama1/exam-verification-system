@@ -63,11 +63,22 @@ export class AttendanceService {
 
 
     const candidate =
-      await this.candidateRepository.findOne({
-        where: {
-          id: dto.candidateId,
-        },
-      });
+  await this.candidateRepository.findOne({
+
+    where: {
+
+      id: dto.candidateId,
+
+    },
+
+
+    relations: {
+
+      center: true,
+
+    },
+
+  });
 
 
 
@@ -83,20 +94,33 @@ export class AttendanceService {
 
     relations: {
 
-      user: true,
+  user: true,
 
-    },
+  center: true,
+
+},
 
   });
 
 
 
     const device =
-      await this.deviceRepository.findOne({
-        where: {
-          id: dto.deviceId,
-        },
-      });
+  await this.deviceRepository.findOne({
+
+    where: {
+
+      id: dto.deviceId,
+
+    },
+
+
+    relations: {
+
+      center: true,
+
+    },
+
+  });
 
 
 
@@ -112,6 +136,23 @@ export class AttendanceService {
 
     }
 
+if (
+
+  candidate.center.id !== operator.center.id ||
+
+  candidate.center.id !== device.center.id
+
+) {
+
+
+  throw new ConflictException(
+
+    'Center mismatch verification blocked',
+
+  );
+
+
+}
 
 
     const existingAttendance =
