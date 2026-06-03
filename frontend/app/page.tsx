@@ -43,9 +43,8 @@ export default function Home() {
     );
 
 
-    alert(
-      "Login successful",
-    );
+    window.location.href =
+  "/dashboard";
 
 
   };
