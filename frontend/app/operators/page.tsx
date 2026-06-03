@@ -1,17 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 
-import {
-  useEffect,
-  useState,
-} from "react";
-
-
-import axios from "axios";
-
+import api from "../../lib/api";
 
 import Sidebar from "../../components/Sidebar";
-
 
 
 export default function Operators() {
@@ -23,7 +16,6 @@ export default function Operators() {
 
   const [centers, setCenters] =
     useState<any[]>([]);
-
 
 
   const [form, setForm] =
@@ -43,73 +35,32 @@ export default function Operators() {
 
 
 
+  const loadData = async () => {
 
 
-  const token = () =>
+    const operatorsResponse =
+      await api.get(
+        "/operators",
+      );
 
-    localStorage.getItem(
-      "token",
+
+    const centersResponse =
+      await api.get(
+        "/centers",
+      );
+
+
+    setOperators(
+      operatorsResponse.data,
     );
 
 
+    setCenters(
+      centersResponse.data,
+    );
 
 
-
-
-  const loadData =
-    async () => {
-
-
-      const headers = {
-
-        Authorization:
-          `Bearer ${token()}`,
-
-      };
-
-
-
-      const operatorsResponse =
-        await axios.get(
-
-          "http://localhost:3000/operators",
-
-          {
-            headers,
-          },
-
-        );
-
-
-
-      const centersResponse =
-        await axios.get(
-
-          "http://localhost:3000/centers",
-
-          {
-            headers,
-          },
-
-        );
-
-
-
-
-      setOperators(
-        operatorsResponse.data,
-      );
-
-
-      setCenters(
-        centersResponse.data,
-      );
-
-
-    };
-
-
-
+  };
 
 
 
@@ -124,58 +75,39 @@ export default function Operators() {
 
 
 
+  const createOperator = async () => {
 
 
-  const createOperator =
-    async () => {
+    await api.post(
 
+      "/operators",
 
-      await axios.post(
+      form,
 
-        "http://localhost:3000/operators",
-
-        form,
-
-
-        {
-
-          headers: {
-
-            Authorization:
-              `Bearer ${token()}`,
-
-          },
-
-        },
-
-      );
+    );
 
 
 
-      setForm({
+    setForm({
 
-        name: "",
+      name: "",
 
-        email: "",
+      email: "",
 
-        password: "",
+      password: "",
 
-        employeeCode: "",
+      employeeCode: "",
 
-        centerId: "",
+      centerId: "",
 
-      });
-
-
-
-      loadData();
-
-
-    };
+    });
 
 
 
+    loadData();
 
+
+  };
 
 
 
@@ -186,7 +118,6 @@ export default function Operators() {
 
 
       <Sidebar />
-
 
 
       <main className="p-10 flex-1">
@@ -200,22 +131,18 @@ export default function Operators() {
 
 
 
-
-
-
         <div className="grid grid-cols-6 gap-2 mb-8">
 
 
           <input
             className="border p-2"
-            placeholder="name"
+            placeholder="Name"
             value={form.name}
-            onChange={
-              e =>
-                setForm({
-                  ...form,
-                  name:e.target.value,
-                })
+            onChange={(e) =>
+              setForm({
+                ...form,
+                name: e.target.value,
+              })
             }
           />
 
@@ -223,50 +150,43 @@ export default function Operators() {
 
           <input
             className="border p-2"
-            placeholder="email"
+            placeholder="Email"
             value={form.email}
-            onChange={
-              e =>
-                setForm({
-                  ...form,
-                  email:e.target.value,
-                })
+            onChange={(e) =>
+              setForm({
+                ...form,
+                email: e.target.value,
+              })
             }
           />
 
 
 
-
           <input
             className="border p-2"
-            placeholder="password"
+            placeholder="Password"
             value={form.password}
-            onChange={
-              e =>
-                setForm({
-                  ...form,
-                  password:e.target.value,
-                })
+            onChange={(e) =>
+              setForm({
+                ...form,
+                password: e.target.value,
+              })
             }
           />
-
 
 
 
           <input
             className="border p-2"
-            placeholder="employeeCode"
+            placeholder="Employee Code"
             value={form.employeeCode}
-            onChange={
-              e =>
-                setForm({
-                  ...form,
-                  employeeCode:e.target.value,
-                })
+            onChange={(e) =>
+              setForm({
+                ...form,
+                employeeCode: e.target.value,
+              })
             }
           />
-
-
 
 
 
@@ -276,17 +196,16 @@ export default function Operators() {
 
             value={form.centerId}
 
+            onChange={(e) =>
 
-            onChange={
-              e =>
-                setForm({
+              setForm({
 
-                  ...form,
+                ...form,
 
-                  centerId:
-                    e.target.value,
+                centerId: e.target.value,
 
-                })
+              })
+
             }
 
           >
@@ -299,31 +218,24 @@ export default function Operators() {
             </option>
 
 
+            {centers.map((center) => (
 
-            {
-              centers.map(
-                center => (
+              <option
 
-                  <option
+                key={center.id}
 
-                    key={center.id}
+                value={center.id}
 
-                    value={center.id}
+              >
 
-                  >
+                {center.name}
 
-                    {center.name}
+              </option>
 
-                  </option>
-
-                )
-              )
-            }
+            ))}
 
 
           </select>
-
-
 
 
 
@@ -341,11 +253,7 @@ export default function Operators() {
           </button>
 
 
-
         </div>
-
-
-
 
 
 
@@ -356,50 +264,41 @@ export default function Operators() {
           <tbody>
 
 
-            {
-              operators.map(
+            {operators.map((operator) => (
 
-                operator => (
-
-
-                  <tr key={operator.id}>
+              <tr key={operator.id}>
 
 
-                    <td className="border p-2">
+                <td className="border p-2">
 
-                      {operator.employeeCode}
+                  {operator.employeeCode}
 
-                    </td>
-
-
-                    <td className="border p-2">
-
-                      {operator.user?.name}
-
-                    </td>
+                </td>
 
 
-                    <td className="border p-2">
+                <td className="border p-2">
 
-                      {operator.center?.name}
+                  {operator.user?.name}
 
-                    </td>
-
-
-                  </tr>
+                </td>
 
 
-                )
+                <td className="border p-2">
 
-              )
-            }
+                  {operator.center?.name}
+
+                </td>
+
+
+              </tr>
+
+            ))}
 
 
           </tbody>
 
 
         </table>
-
 
 
       </main>

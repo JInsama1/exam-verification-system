@@ -7,10 +7,11 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
+
 
 
 
@@ -19,6 +20,7 @@ export default function Exams() {
 
   const [exams, setExams] =
     useState<any[]>([]);
+
 
 
 
@@ -38,13 +40,6 @@ export default function Exams() {
 
 
 
-  const token = () =>
-
-    localStorage.getItem(
-      "token",
-    );
-
-
 
 
   const loadExams =
@@ -52,20 +47,8 @@ export default function Exams() {
 
 
       const response =
-        await axios.get(
-
-          "http://localhost:3000/exams",
-
-
-          {
-            headers: {
-
-              Authorization:
-                `Bearer ${token()}`,
-
-            },
-          },
-
+        await api.get(
+          "/exams",
         );
 
 
@@ -76,6 +59,8 @@ export default function Exams() {
 
 
     };
+
+
 
 
 
@@ -94,27 +79,21 @@ export default function Exams() {
 
 
 
+
+
   const createExam =
     async () => {
 
 
-      await axios.post(
+      await api.post(
 
-        "http://localhost:3000/exams",
+        "/exams",
 
         form,
 
-
-        {
-          headers: {
-
-            Authorization:
-              `Bearer ${token()}`,
-
-          },
-        },
-
       );
+
+
 
 
 
@@ -134,10 +113,14 @@ export default function Exams() {
 
 
 
+
       loadExams();
 
 
     };
+
+
+
 
 
 
@@ -155,6 +138,7 @@ export default function Exams() {
 
 
 
+
       <main className="p-10 flex-1">
 
 
@@ -169,14 +153,16 @@ export default function Exams() {
 
 
 
+
         <div className="grid grid-cols-5 gap-2 mb-8">
 
 
-
           {
+
             Object.keys(form)
               .map(
-                key => (
+
+                (key) => (
 
 
                   <input
@@ -187,31 +173,47 @@ export default function Exams() {
 
                     placeholder={key}
 
+
                     value={
+
                       form[
+
                         key as keyof typeof form
+
                       ]
+
                     }
 
 
-                    onChange={
-                      e =>
-                        setForm({
 
-                          ...form,
+                    onChange={(e) =>
 
-                          [key]:
-                            e.target.value,
 
-                        })
+                      setForm({
+
+                        ...form,
+
+
+                        [key]:
+
+                          e.target.value,
+
+
+                      })
+
+
                     }
+
 
                   />
 
 
                 )
+
               )
+
           }
+
 
 
 
@@ -241,16 +243,21 @@ export default function Exams() {
 
 
 
+
+
+
         <table className="w-full border">
 
 
           <tbody>
 
 
+
             {
+
               exams.map(
 
-                exam => (
+                (exam) => (
 
 
                   <tr key={exam.id}>
@@ -264,6 +271,7 @@ export default function Exams() {
 
 
 
+
                     <td className="border p-2">
 
                       {exam.name}
@@ -272,11 +280,13 @@ export default function Exams() {
 
 
 
+
                     <td className="border p-2">
 
                       {exam.startDate}
 
                     </td>
+
 
 
 
@@ -294,6 +304,7 @@ export default function Exams() {
                 )
 
               )
+
             }
 
 

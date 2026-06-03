@@ -7,10 +7,11 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
+
 
 
 
@@ -19,6 +20,7 @@ export default function Centers() {
 
   const [centers, setCenters] =
     useState<any[]>([]);
+
 
 
 
@@ -40,32 +42,15 @@ export default function Centers() {
 
 
 
+
+
   const loadCenters =
     async () => {
 
 
-      const token =
-        localStorage.getItem(
-          "token",
-        );
-
-
-
       const response =
-        await axios.get(
-
-          "http://localhost:3000/centers",
-
-
-          {
-            headers: {
-
-              Authorization:
-                `Bearer ${token}`,
-
-            },
-          },
-
+        await api.get(
+          "/centers",
         );
 
 
@@ -76,6 +61,9 @@ export default function Centers() {
 
 
     };
+
+
+
 
 
 
@@ -92,34 +80,23 @@ export default function Centers() {
 
 
 
+
+
+
   const createCenter =
     async () => {
 
 
-      const token =
-        localStorage.getItem(
-          "token",
-        );
+      await api.post(
 
-
-
-      await axios.post(
-
-        "http://localhost:3000/centers",
+        "/centers",
 
         form,
 
-
-        {
-          headers: {
-
-            Authorization:
-              `Bearer ${token}`,
-
-          },
-        },
-
       );
+
+
+
 
 
 
@@ -139,10 +116,17 @@ export default function Centers() {
 
 
 
+
+
       loadCenters();
 
 
     };
+
+
+
+
+
 
 
 
@@ -154,6 +138,7 @@ export default function Centers() {
 
 
       <Sidebar />
+
 
 
 
@@ -170,49 +155,75 @@ export default function Centers() {
 
 
 
+
+
+
         <div className="grid grid-cols-6 gap-2 mb-8">
 
 
           {
+
             Object.keys(form)
-              .map((key) => (
+              .map(
+
+                (key) => (
 
 
-                <input
+                  <input
 
-                  key={key}
-
-                  className="border p-2"
-
-                  placeholder={key}
+                    key={key}
 
 
-                  value={
-                    form[
-                      key as keyof typeof form
-                    ]
-                  }
+                    className="border p-2"
 
 
-                  onChange={(e) =>
-
-                    setForm({
-
-                      ...form,
+                    placeholder={key}
 
 
-                      [key]:
-                        e.target.value,
+                    value={
 
-                    })
+                      form[
 
-                  }
+                        key as keyof typeof form
 
-                />
+                      ]
+
+                    }
 
 
-              ))
+
+                    onChange={(e) =>
+
+
+                      setForm({
+
+
+                        ...form,
+
+
+                        [key]:
+
+                          e.target.value,
+
+
+                      })
+
+
+                    }
+
+
+                  />
+
+
+                )
+
+              )
+
           }
+
+
+
+
 
 
 
@@ -221,19 +232,24 @@ export default function Centers() {
 
             className="border p-2 font-bold"
 
-            onClick={
-              createCenter
-            }
+
+            onClick={createCenter}
 
           >
 
+
             Create
+
 
           </button>
 
 
 
         </div>
+
+
+
+
 
 
 
@@ -256,11 +272,13 @@ export default function Centers() {
               </th>
 
 
+
               <th className="border p-2">
 
                 Name
 
               </th>
+
 
 
               <th className="border p-2">
@@ -270,11 +288,13 @@ export default function Centers() {
               </th>
 
 
+
               <th className="border p-2">
 
                 State
 
               </th>
+
 
 
               <th className="border p-2">
@@ -288,6 +308,9 @@ export default function Centers() {
 
 
           </thead>
+
+
+
 
 
 
@@ -340,6 +363,7 @@ export default function Centers() {
 
                     <td className="border p-2">
 
+
                       {
 
                         center.active
@@ -349,6 +373,7 @@ export default function Centers() {
                           : "Inactive"
 
                       }
+
 
                     </td>
 
@@ -368,6 +393,7 @@ export default function Centers() {
 
 
         </table>
+
 
 
 

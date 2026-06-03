@@ -7,7 +7,7 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
@@ -26,6 +26,7 @@ export default function Devices() {
 
 
 
+
   const [form, setForm] =
     useState({
 
@@ -41,52 +42,20 @@ export default function Devices() {
 
 
 
-  const token = () =>
-
-    localStorage.getItem(
-      "token",
-    );
-
-
-
-
-
-
   const loadData =
     async () => {
 
 
-      const headers = {
-
-        Authorization:
-          `Bearer ${token()}`,
-
-      };
-
-
-
       const deviceResponse =
-        await axios.get(
-
-          "http://localhost:3000/devices",
-
-          {
-            headers,
-          },
-
+        await api.get(
+          "/devices",
         );
 
 
 
       const centerResponse =
-        await axios.get(
-
-          "http://localhost:3000/centers",
-
-          {
-            headers,
-          },
-
+        await api.get(
+          "/centers",
         );
 
 
@@ -123,29 +92,19 @@ export default function Devices() {
 
 
 
+
   const createDevice =
     async () => {
 
 
-      await axios.post(
+      await api.post(
 
-        "http://localhost:3000/devices",
+        "/devices",
 
         form,
 
-
-        {
-
-          headers: {
-
-            Authorization:
-              `Bearer ${token()}`,
-
-          },
-
-        },
-
       );
+
 
 
 
@@ -167,6 +126,7 @@ export default function Devices() {
 
 
     };
+
 
 
 
@@ -197,7 +157,11 @@ export default function Devices() {
 
 
 
+
+
+
         <div className="grid grid-cols-4 gap-2 mb-8">
+
 
 
           <input
@@ -208,19 +172,21 @@ export default function Devices() {
 
             value={form.deviceCode}
 
-            onChange={
-              e =>
-                setForm({
+            onChange={(e) =>
 
-                  ...form,
+              setForm({
 
-                  deviceCode:
-                    e.target.value,
+                ...form,
 
-                })
+                deviceCode:
+                  e.target.value,
+
+              })
+
             }
 
           />
+
 
 
 
@@ -233,16 +199,17 @@ export default function Devices() {
 
             value={form.serialNumber}
 
-            onChange={
-              e =>
-                setForm({
+            onChange={(e) =>
 
-                  ...form,
+              setForm({
 
-                  serialNumber:
-                    e.target.value,
+                ...form,
 
-                })
+                serialNumber:
+                  e.target.value,
+
+              })
+
             }
 
           />
@@ -259,16 +226,17 @@ export default function Devices() {
 
             value={form.centerId}
 
-            onChange={
-              e =>
-                setForm({
+            onChange={(e) =>
 
-                  ...form,
+              setForm({
 
-                  centerId:
-                    e.target.value,
+                ...form,
 
-                })
+                centerId:
+                  e.target.value,
+
+              })
+
             }
 
           >
@@ -283,8 +251,11 @@ export default function Devices() {
 
 
             {
+
               centers.map(
-                center => (
+
+                (center) => (
+
 
                   <option
 
@@ -298,12 +269,17 @@ export default function Devices() {
 
                   </option>
 
+
                 )
+
               )
+
             }
 
 
+
           </select>
+
 
 
 
@@ -341,10 +317,12 @@ export default function Devices() {
           <tbody>
 
 
+
             {
+
               devices.map(
 
-                device => (
+                (device) => (
 
 
                   <tr key={device.id}>
@@ -358,11 +336,13 @@ export default function Devices() {
 
 
 
+
                     <td className="border p-2">
 
                       {device.serialNumber}
 
                     </td>
+
 
 
 
@@ -377,13 +357,17 @@ export default function Devices() {
 
                     <td className="border p-2">
 
+
                       {
+
                         device.locked
 
                           ? "Locked"
 
                           : "Available"
+
                       }
+
 
                     </td>
 
@@ -395,6 +379,7 @@ export default function Devices() {
                 )
 
               )
+
             }
 
 
@@ -402,7 +387,6 @@ export default function Devices() {
 
 
         </table>
-
 
 
 

@@ -7,7 +7,7 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
@@ -42,51 +42,22 @@ export default function Shifts() {
 
 
 
-  const token = () =>
-
-    localStorage.getItem(
-      "token",
-    );
-
-
-
-
   const loadData =
     async () => {
 
 
-      const headers = {
-
-        Authorization:
-          `Bearer ${token()}`,
-
-      };
-
-
-
       const shiftsResponse =
-        await axios.get(
-
-          "http://localhost:3000/shifts",
-
-          {
-            headers,
-          },
-
+        await api.get(
+          "/shifts",
         );
 
 
 
       const examsResponse =
-        await axios.get(
-
-          "http://localhost:3000/exams",
-
-          {
-            headers,
-          },
-
+        await api.get(
+          "/exams",
         );
+
 
 
 
@@ -125,23 +96,14 @@ export default function Shifts() {
     async () => {
 
 
-      await axios.post(
+      await api.post(
 
-        "http://localhost:3000/shifts",
+        "/shifts",
 
         form,
 
-
-        {
-          headers: {
-
-            Authorization:
-              `Bearer ${token()}`,
-
-          },
-        },
-
       );
+
 
 
 
@@ -210,11 +172,12 @@ export default function Shifts() {
               e =>
                 setForm({
                   ...form,
-                  name:e.target.value,
+                  name: e.target.value,
                 })
             }
 
           />
+
 
 
 
@@ -230,11 +193,12 @@ export default function Shifts() {
               e =>
                 setForm({
                   ...form,
-                  startTime:e.target.value,
+                  startTime: e.target.value,
                 })
             }
 
           />
+
 
 
 
@@ -250,11 +214,13 @@ export default function Shifts() {
               e =>
                 setForm({
                   ...form,
-                  endTime:e.target.value,
+                  endTime: e.target.value,
                 })
             }
 
           />
+
+
 
 
 
@@ -272,7 +238,8 @@ export default function Shifts() {
 
                   ...form,
 
-                  examId:e.target.value,
+                  examId:
+                    e.target.value,
 
                 })
             }

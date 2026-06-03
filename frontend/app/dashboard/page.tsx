@@ -7,8 +7,11 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import api from "../../lib/api";
+
+
 import Sidebar from "../../components/Sidebar";
+
 
 
 export default function Dashboard() {
@@ -19,6 +22,8 @@ export default function Dashboard() {
 
 
 
+
+
   useEffect(() => {
 
 
@@ -26,27 +31,10 @@ export default function Dashboard() {
       async () => {
 
 
-        const token =
-          localStorage.getItem(
-            "token",
-          );
-
-
-
         const response =
-          await axios.get(
+          await api.get(
 
-            "http://localhost:3000/reports/dashboard",
-
-
-            {
-              headers: {
-
-                Authorization:
-                  `Bearer ${token}`,
-
-              },
-            },
+            "/reports/dashboard",
 
           );
 
@@ -69,82 +57,102 @@ export default function Dashboard() {
 
 
 
+
   if (!data) {
+
 
     return (
 
       <div>
+
         Loading...
+
       </div>
 
     );
+
 
   }
 
 
 
 
+
+
   return (
 
-  <div className="flex">
+    <div className="flex">
 
 
-    <Sidebar />
-
-
-    <main className="p-10 flex-1">
-
-
-      <h1 className="text-3xl font-bold mb-8">
-
-        Admin Dashboard
-
-      </h1>
+      <Sidebar />
 
 
 
-      <div className="grid grid-cols-3 gap-5">
+      <main className="p-10 flex-1">
 
 
-        {
-          Object.entries(data)
-            .map(([key, value]) => (
+        <h1 className="text-3xl font-bold mb-8">
 
-              <div
+          Admin Dashboard
 
-                key={key}
-
-                className="border rounded-xl p-5"
-
-              >
+        </h1>
 
 
-                <p>
-
-                  {key}
-
-                </p>
 
 
-                <h2 className="text-3xl font-bold">
-
-                  {String(value)}
-
-                </h2>
+        <div className="grid grid-cols-3 gap-5">
 
 
-              </div>
+          {
 
-            ))
-        }
+            Object.entries(data)
+              .map(
+
+                ([key, value]) => (
 
 
-      </div>
+                  <div
+
+                    key={key}
+
+                    className="border rounded-xl p-5"
+
+                  >
 
 
-    </main>
+                    <p>
 
-</div>
+                      {key}
+
+                    </p>
+
+
+
+                    <h2 className="text-3xl font-bold">
+
+                      {String(value)}
+
+                    </h2>
+
+
+                  </div>
+
+
+                )
+
+              )
+
+          }
+
+
+        </div>
+
+
+
+      </main>
+
+
+    </div>
 
   );
 

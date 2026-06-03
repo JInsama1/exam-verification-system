@@ -7,7 +7,7 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
@@ -35,6 +35,7 @@ export default function Attendance() {
 
 
 
+
   const [form, setForm] =
     useState({
 
@@ -53,59 +54,44 @@ export default function Attendance() {
 
 
 
-  const token = () =>
-
-    localStorage.getItem(
-      "token",
-    );
-
-
-
-
-
 
   const loadData =
     async () => {
 
 
-      const headers = {
-
-        Authorization:
-          `Bearer ${token()}`,
-
-      };
-
-
-
       const [
+
         attendanceRes,
+
         candidateRes,
+
         operatorRes,
+
         deviceRes,
+
       ] = await Promise.all([
 
 
-        axios.get(
-          "http://localhost:3000/attendance",
-          { headers },
+        api.get(
+          "/attendance",
         ),
 
 
-        axios.get(
-          "http://localhost:3000/candidates",
-          { headers },
+
+        api.get(
+          "/candidates",
         ),
 
 
-        axios.get(
-          "http://localhost:3000/operators",
-          { headers },
+
+        api.get(
+          "/operators",
         ),
 
 
-        axios.get(
-          "http://localhost:3000/devices",
-          { headers },
+
+        api.get(
+          "/devices",
         ),
 
 
@@ -143,7 +129,6 @@ export default function Attendance() {
 
 
 
-
   useEffect(() => {
 
 
@@ -163,25 +148,14 @@ export default function Attendance() {
     async () => {
 
 
-      await axios.post(
+      await api.post(
 
-        "http://localhost:3000/attendance/verify",
+        "/attendance/verify",
 
         form,
 
-
-        {
-
-          headers: {
-
-            Authorization:
-              `Bearer ${token()}`,
-
-          },
-
-        },
-
       );
+
 
 
 
@@ -213,12 +187,15 @@ export default function Attendance() {
 
 
 
+
+
   return (
 
     <div className="flex">
 
 
       <Sidebar />
+
 
 
 
@@ -236,47 +213,69 @@ export default function Attendance() {
 
 
 
+
+
         <div className="grid grid-cols-5 gap-2 mb-8">
 
 
 
 
 
+
           <select
 
             className="border p-2"
 
+            value={form.candidateId}
+
             onChange={
               e =>
                 setForm({
+
                   ...form,
-                  candidateId:e.target.value,
+
+                  candidateId:
+                    e.target.value,
+
                 })
             }
 
           >
 
 
-            <option>
+            <option value="">
+
               Candidate
+
             </option>
 
 
+
+
             {
+
               candidates.map(
+
                 c => (
 
+
                   <option
+
                     key={c.id}
+
                     value={c.id}
+
                   >
 
                     {c.rollNumber} - {c.name}
 
                   </option>
 
+
                 )
+
               )
+
             }
 
 
@@ -289,45 +288,66 @@ export default function Attendance() {
 
 
 
+
           <select
 
             className="border p-2"
 
+            value={form.operatorId}
+
             onChange={
               e =>
                 setForm({
+
                   ...form,
-                  operatorId:e.target.value,
+
+                  operatorId:
+                    e.target.value,
+
                 })
             }
 
           >
 
 
-            <option>
+            <option value="">
+
               Operator
+
             </option>
 
 
+
+
             {
+
               operators.map(
+
                 o => (
 
+
                   <option
+
                     key={o.id}
+
                     value={o.id}
+
                   >
 
                     {o.employeeCode}
 
                   </option>
 
+
                 )
+
               )
+
             }
 
 
           </select>
+
 
 
 
@@ -341,41 +361,63 @@ export default function Attendance() {
 
             className="border p-2"
 
+            value={form.deviceId}
+
             onChange={
               e =>
                 setForm({
+
                   ...form,
-                  deviceId:e.target.value,
+
+                  deviceId:
+                    e.target.value,
+
                 })
             }
 
           >
 
 
-            <option>
+            <option value="">
+
               Device
+
             </option>
 
 
+
+
             {
+
               devices.map(
+
                 d => (
 
+
                   <option
+
                     key={d.id}
+
                     value={d.id}
+
                   >
 
                     {d.deviceCode}
 
                   </option>
 
+
                 )
+
               )
+
             }
 
 
           </select>
+
+
+
 
 
 
@@ -394,12 +436,18 @@ export default function Attendance() {
             onChange={
               e =>
                 setForm({
+
                   ...form,
-                  remarks:e.target.value,
+
+                  remarks:
+                    e.target.value,
+
                 })
             }
 
           />
+
+
 
 
 
@@ -420,8 +468,8 @@ export default function Attendance() {
 
 
 
-
         </div>
+
 
 
 
@@ -437,7 +485,9 @@ export default function Attendance() {
           <tbody>
 
 
+
             {
+
               attendance.map(
 
                 a => (
@@ -451,6 +501,7 @@ export default function Attendance() {
                       {a.candidate?.name}
 
                     </td>
+
 
 
 
@@ -472,6 +523,7 @@ export default function Attendance() {
 
 
 
+
                     <td className="border p-2">
 
                       Verified
@@ -486,6 +538,7 @@ export default function Attendance() {
                 )
 
               )
+
             }
 
 

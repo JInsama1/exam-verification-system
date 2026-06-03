@@ -7,7 +7,7 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
@@ -56,59 +56,42 @@ export default function Candidates() {
 
 
 
-  const token = () =>
-
-    localStorage.getItem(
-      "token",
-    );
-
-
-
-
 
 
   const loadData =
     async () => {
 
 
-      const headers = {
-
-        Authorization:
-          `Bearer ${token()}`,
-
-      };
-
-
-
       const [
+
         candidatesRes,
+
         examsRes,
+
         shiftsRes,
+
         centersRes,
+
       ] = await Promise.all([
 
 
-        axios.get(
-          "http://localhost:3000/candidates",
-          { headers },
+        api.get(
+          "/candidates",
         ),
 
 
-        axios.get(
-          "http://localhost:3000/exams",
-          { headers },
+        api.get(
+          "/exams",
         ),
 
 
-        axios.get(
-          "http://localhost:3000/shifts",
-          { headers },
+        api.get(
+          "/shifts",
         ),
 
 
-        axios.get(
-          "http://localhost:3000/centers",
-          { headers },
+        api.get(
+          "/centers",
         ),
 
 
@@ -165,26 +148,13 @@ export default function Candidates() {
     async () => {
 
 
-      await axios.post(
+      await api.post(
 
-        "http://localhost:3000/candidates",
+        "/candidates",
 
         form,
 
-
-        {
-
-          headers: {
-
-            Authorization:
-              `Bearer ${token()}`,
-
-          },
-
-        },
-
       );
-
 
 
 
@@ -247,6 +217,7 @@ export default function Candidates() {
         <div className="grid grid-cols-7 gap-2 mb-8">
 
 
+
           <input
 
             className="border p-2"
@@ -259,11 +230,13 @@ export default function Candidates() {
               e =>
                 setForm({
                   ...form,
-                  rollNumber:e.target.value,
+                  rollNumber:
+                    e.target.value,
                 })
             }
 
           />
+
 
 
 
@@ -280,7 +253,8 @@ export default function Candidates() {
               e =>
                 setForm({
                   ...form,
-                  name:e.target.value,
+                  name:
+                    e.target.value,
                 })
             }
 
@@ -302,7 +276,8 @@ export default function Candidates() {
               e =>
                 setForm({
                   ...form,
-                  photoUrl:e.target.value,
+                  photoUrl:
+                    e.target.value,
                 })
             }
 
@@ -313,24 +288,25 @@ export default function Candidates() {
 
 
 
-
-
           <select
 
             className="border p-2"
+
+            value={form.examId}
 
             onChange={
               e =>
                 setForm({
                   ...form,
-                  examId:e.target.value,
+                  examId:
+                    e.target.value,
                 })
             }
 
           >
 
 
-            <option>
+            <option value="">
 
               Exam
 
@@ -343,8 +319,11 @@ export default function Candidates() {
                 exam => (
 
                   <option
+
                     key={exam.id}
+
                     value={exam.id}
+
                   >
 
                     {exam.name}
@@ -369,22 +348,26 @@ export default function Candidates() {
 
             className="border p-2"
 
+            value={form.shiftId}
+
             onChange={
               e =>
                 setForm({
                   ...form,
-                  shiftId:e.target.value,
+                  shiftId:
+                    e.target.value,
                 })
             }
 
           >
 
 
-            <option>
+            <option value="">
 
               Shift
 
             </option>
+
 
 
             {
@@ -392,8 +375,11 @@ export default function Candidates() {
                 shift => (
 
                   <option
+
                     key={shift.id}
+
                     value={shift.id}
+
                   >
 
                     {shift.name}
@@ -418,22 +404,26 @@ export default function Candidates() {
 
             className="border p-2"
 
+            value={form.centerId}
+
             onChange={
               e =>
                 setForm({
                   ...form,
-                  centerId:e.target.value,
+                  centerId:
+                    e.target.value,
                 })
             }
 
           >
 
 
-            <option>
+            <option value="">
 
               Center
 
             </option>
+
 
 
             {
@@ -441,8 +431,11 @@ export default function Candidates() {
                 center => (
 
                   <option
+
                     key={center.id}
+
                     value={center.id}
+
                   >
 
                     {center.name}
@@ -474,7 +467,6 @@ export default function Candidates() {
             Create
 
           </button>
-
 
 
 
@@ -516,9 +508,16 @@ export default function Candidates() {
                     </td>
 
 
+
                     <td className="border p-2">
 
-                      {c.verified ? "Verified" : "Pending"}
+                      {
+                        c.verified
+
+                          ? "Verified"
+
+                          : "Pending"
+                      }
 
                     </td>
 
@@ -536,7 +535,6 @@ export default function Candidates() {
 
 
         </table>
-
 
 
 
