@@ -113,8 +113,8 @@ const selectedCandidate =
 
 
       setCandidates(
-        candidateRes.data,
-      );
+  candidateRes.data.data,
+);
 
 
       setOperators(
