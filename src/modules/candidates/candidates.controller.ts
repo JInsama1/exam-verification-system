@@ -1,5 +1,6 @@
 import {
   Param,
+  Query,
   UseInterceptors,
   Body,
   Controller,
@@ -48,6 +49,7 @@ import {
 
 
 
+
 @Controller(
   'candidates',
 )
@@ -68,6 +70,7 @@ export class CandidatesController {
       CandidatesService,
 
   ) {}
+
 
 
 
@@ -99,6 +102,8 @@ export class CandidatesController {
 
 
   }
+
+
 
 
 
@@ -145,53 +150,62 @@ export class CandidatesController {
 
 
 
-@Post(
-  ':id/photo',
-)
 
 
-@Roles(
-  Role.MASTER_ADMIN,
-  Role.ADMIN,
-)
 
 
-@UseInterceptors(
-
-  FileInterceptor(
-    'file',
-  ),
-
-)
 
 
-uploadPhoto(
-
-  @Param(
-    'id',
+  @Post(
+    ':id/photo',
   )
 
-  id: string,
+
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.ADMIN,
+  )
+
+
+  @UseInterceptors(
+
+    FileInterceptor(
+      'file',
+    ),
+
+  )
+
+
+  uploadPhoto(
+
+    @Param(
+      'id',
+    )
+    id: string,
+
+
+    @UploadedFile()
+    file: Express.Multer.File,
+
+  ) {
+
+
+    return this.candidatesService.uploadPhoto(
+
+      id,
+
+      file.filename,
+
+    );
+
+
+  }
 
 
 
-  @UploadedFile()
-
-  file: Express.Multer.File,
-
-) {
 
 
-  return this.candidatesService.uploadPhoto(
 
-    id,
-
-    file.filename,
-
-  );
-
-
-}
 
 
 
@@ -206,10 +220,29 @@ uploadPhoto(
   )
 
 
-  findAll() {
+  findAll(
+
+    @Query(
+      'search',
+    )
+    search: string,
 
 
-    return this.candidatesService.findAll();
+    @Query(
+      'page',
+    )
+    page: string,
+
+  ) {
+
+
+    return this.candidatesService.findAll(
+
+      search,
+
+      Number(page) || 1,
+
+    );
 
 
   }

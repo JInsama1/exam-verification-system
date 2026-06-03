@@ -14,6 +14,7 @@ import {
 
 import {
   Repository,
+  ILike,
 } from 'typeorm';
 
 
@@ -419,10 +420,62 @@ async uploadPhoto(
 
 
 
-findAll() {
+async findAll(
+
+  search?: string,
+
+  page = 1,
+
+) {
 
 
-  return this.candidateRepository.find({
+  const limit = 20;
+
+
+
+  const where = search
+
+    ? [
+
+        {
+
+          rollNumber:
+
+            ILike(
+              `%${search}%`,
+            ),
+
+        },
+
+
+        {
+
+          name:
+
+            ILike(
+              `%${search}%`,
+            ),
+
+        },
+
+      ]
+
+    : {};
+
+
+
+
+
+  const [
+
+    data,
+
+    total,
+
+  ] = await this.candidateRepository.findAndCount({
+
+    where,
+
 
     relations: {
 
@@ -434,7 +487,46 @@ findAll() {
 
     },
 
+
+    take:
+
+      limit,
+
+
+    skip:
+
+      (page - 1) * limit,
+
+
+    order: {
+
+      createdAt:
+
+        'DESC',
+
+    },
+
   });
+
+
+
+
+
+  return {
+
+    data,
+
+    total,
+
+    page,
+
+    pages:
+
+      Math.ceil(
+        total / limit,
+      ),
+
+  };
 
 
 }
