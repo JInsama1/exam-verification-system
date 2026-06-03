@@ -144,7 +144,7 @@ export default function Attendance() {
 
 
 
-  const verify =
+    const verify =
     async () => {
 
 
@@ -155,7 +155,6 @@ export default function Attendance() {
         form,
 
       );
-
 
 
 
@@ -175,13 +174,10 @@ export default function Attendance() {
 
 
 
-      loadData();
+      await loadData();
 
 
     };
-
-
-
 
 
 

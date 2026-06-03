@@ -89,6 +89,12 @@ export default function Sidebar() {
 
           </Link>
 
+          <Link href="/audit">
+
+            Audit Logs
+
+          </Link>
+
 
         </nav>
 
