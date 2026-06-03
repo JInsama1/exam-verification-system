@@ -9,57 +9,84 @@ import {
 
 import { CentersService } from './centers.service';
 
+
 import { CreateCenterDto } from './dto/create-center.dto';
 
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
+
 import { RolesGuard } from '../../common/guards/roles.guard';
 
+
 import { Roles } from '../../common/decorators/roles.decorator';
+
 
 import { Role } from '../../common/enums/role.enum';
 
 
-@Controller('centers')
+
+
+@Controller(
+  'centers',
+)
+
+
 @UseGuards(
   JwtAuthGuard,
   RolesGuard,
 )
+
+
+@Roles(
+  Role.MASTER_ADMIN,
+  Role.ADMIN,
+)
+
+
 export class CentersController {
 
 
   constructor(
+
     private readonly centersService:
       CentersService,
+
   ) {}
 
 
+
+
   @Post()
-  @Roles(
-    Role.MASTER_ADMIN,
-    Role.ADMIN,
-  )
+
   create(
-    @Body() dto: CreateCenterDto,
+
+    @Body()
+    dto: CreateCenterDto,
+
   ) {
+
 
     return this.centersService.create(
       dto,
     );
 
+
   }
+
+
+
 
 
   @Get()
-  @Roles(
-    Role.MASTER_ADMIN,
-    Role.ADMIN,
-  )
+
   findAll() {
+
 
     return this.centersService.findAll();
 
+
   }
+
 
 }

@@ -20,6 +20,8 @@ import { Candidate } from './database/entities/candidate.entity';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { Attendance } from './database/entities/attendance.entity';
 import { ReportsModule } from './modules/reports/reports.module';
+import { AuditLog } from './database/entities/audit-log.entity';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { ReportsModule } from './modules/reports/reports.module';
   Shift,
   Candidate,
   Attendance,
+  AuditLog,
 ],
     }),
 
@@ -60,6 +63,8 @@ import { ReportsModule } from './modules/reports/reports.module';
     AttendanceModule,
 
     ReportsModule,
+
+    AuditModule,
   ],
 })
 export class AppModule {}

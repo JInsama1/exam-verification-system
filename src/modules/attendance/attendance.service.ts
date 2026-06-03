@@ -5,6 +5,11 @@ import {
 } from '@nestjs/common';
 
 
+import {
+  AuditService,
+} from '../audit/audit.service';
+
+
 import { InjectRepository } from '@nestjs/typeorm';
 
 
@@ -27,26 +32,30 @@ export class AttendanceService {
 
   constructor(
 
-    @InjectRepository(Attendance)
-    private attendanceRepository:
-      Repository<Attendance>,
+  @InjectRepository(Attendance)
+  private attendanceRepository:
+    Repository<Attendance>,
 
 
-    @InjectRepository(Candidate)
-    private candidateRepository:
-      Repository<Candidate>,
+  @InjectRepository(Candidate)
+  private candidateRepository:
+    Repository<Candidate>,
 
 
-    @InjectRepository(Operator)
-    private operatorRepository:
-      Repository<Operator>,
+  @InjectRepository(Operator)
+  private operatorRepository:
+    Repository<Operator>,
 
 
-    @InjectRepository(Device)
-    private deviceRepository:
-      Repository<Device>,
+  @InjectRepository(Device)
+  private deviceRepository:
+    Repository<Device>,
 
-  ) {}
+
+  private readonly auditService:
+    AuditService,
+
+) {}
 
 
 
@@ -148,9 +157,41 @@ export class AttendanceService {
 
 
 
-    return this.attendanceRepository.save(
-      attendance,
-    );
+    const saved =
+  await this.attendanceRepository.save(
+    attendance,
+  );
+
+
+
+
+await this.auditService.log(
+
+  operator.user.id,
+
+  'VERIFY_CANDIDATE',
+
+  {
+
+    candidateId:
+      candidate.id,
+
+
+    candidateName:
+      candidate.name,
+
+
+    deviceId:
+      device.id,
+
+  },
+
+);
+
+
+
+
+return saved;
 
   }
 
