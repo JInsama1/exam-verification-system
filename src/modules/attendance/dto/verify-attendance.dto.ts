@@ -1,22 +1,40 @@
-import { IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
+
+
 
 
 export class VerifyAttendanceDto {
 
 
-  @IsString()
+  @IsUUID()
+  @IsNotEmpty()
   candidateId: string;
 
 
-  @IsString()
+
+
+  @IsUUID()
+  @IsNotEmpty()
   operatorId: string;
 
 
-  @IsString()
+
+
+  @IsUUID()
+  @IsNotEmpty()
   deviceId: string;
 
 
+
+
   @IsString()
-  remarks: string;
+  @IsOptional()
+  remarks?: string;
+
 
 }

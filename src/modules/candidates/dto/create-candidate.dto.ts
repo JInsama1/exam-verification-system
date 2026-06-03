@@ -1,30 +1,53 @@
-import { IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+} from 'class-validator';
+
+
 
 
 export class CreateCandidateDto {
 
 
   @IsString()
+  @IsNotEmpty()
   rollNumber: string;
 
 
+
+
   @IsString()
+  @IsNotEmpty()
   name: string;
 
 
+
+
   @IsString()
+  @IsNotEmpty()
   photoUrl: string;
 
 
-  @IsString()
+
+
+  @IsUUID()
+  @IsNotEmpty()
   examId: string;
 
 
-  @IsString()
+
+
+  @IsUUID()
+  @IsNotEmpty()
   shiftId: string;
 
 
-  @IsString()
+
+
+  @IsUUID()
+  @IsNotEmpty()
   centerId: string;
+
 
 }

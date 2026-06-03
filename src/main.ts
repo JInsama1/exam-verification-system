@@ -1,14 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 
+
 import {
   ClassSerializerInterceptor,
   ValidationPipe,
 } from '@nestjs/common';
 
-import { Reflector } from '@nestjs/core';
+
+import {
+  Reflector,
+} from '@nestjs/core';
 
 
 import { AppModule } from './app.module';
+
 
 
 
@@ -21,11 +26,16 @@ async function bootstrap() {
     );
 
 
+
+
   app.enableCors({
 
     origin: [
+
       'http://localhost:3001',
+
       'http://localhost:3000',
+
     ],
 
 
@@ -34,32 +44,58 @@ async function bootstrap() {
   });
 
 
+
+
+
+
   app.useGlobalInterceptors(
 
     new ClassSerializerInterceptor(
-      app.get(Reflector),
+
+      app.get(
+        Reflector,
+      ),
+
     ),
 
   );
 
 
 
+
+
+
   app.useGlobalPipes(
 
     new ValidationPipe({
+
       whitelist: true,
+
+
+      forbidNonWhitelisted: true,
+
+
+      transform: true,
+
     }),
 
   );
 
 
 
+
+
+
   await app.listen(
+
     process.env.PORT ?? 3000,
+
   );
 
 
 }
+
+
 
 
 bootstrap();

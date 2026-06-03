@@ -1,18 +1,30 @@
-import { IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+} from 'class-validator';
+
+
 
 
 export class CreateDeviceDto {
 
 
   @IsString()
+  @IsNotEmpty()
   deviceCode: string;
 
 
+
   @IsString()
+  @IsNotEmpty()
   serialNumber: string;
 
 
-  @IsString()
+
+  @IsUUID()
+  @IsNotEmpty()
   centerId: string;
+
 
 }
