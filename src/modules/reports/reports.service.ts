@@ -1,3 +1,6 @@
+import * as XLSX from 'xlsx';
+
+
 import { Injectable } from '@nestjs/common';
 
 
@@ -12,6 +15,8 @@ import { Attendance } from '../../database/entities/attendance.entity';
 import { Center } from '../../database/entities/center.entity';
 import { Device } from '../../database/entities/device.entity';
 import { Operator } from '../../database/entities/operator.entity';
+
+
 
 
 
@@ -49,6 +54,9 @@ export class ReportsService {
 
 
 
+
+
+
   async dashboard() {
 
 
@@ -56,20 +64,25 @@ export class ReportsService {
       await this.candidateRepository.count();
 
 
+
     const verified =
       await this.attendanceRepository.count();
+
 
 
     const centers =
       await this.centerRepository.count();
 
 
+
     const devices =
       await this.deviceRepository.count();
 
 
+
     const operators =
       await this.operatorRepository.count();
+
 
 
 
@@ -89,6 +102,136 @@ export class ReportsService {
       operators,
 
     };
+
+
+  }
+
+
+
+
+
+
+
+
+  async exportAttendance() {
+
+
+    const attendance =
+      await this.attendanceRepository.find({
+
+        relations: {
+
+          candidate: {
+
+            exam: true,
+
+            center: true,
+
+          },
+
+
+          operator: true,
+
+
+          device: true,
+
+        },
+
+      });
+
+
+
+
+
+
+    const rows =
+      attendance.map(
+
+        item => ({
+
+          rollNumber:
+            item.candidate.rollNumber,
+
+
+          candidate:
+            item.candidate.name,
+
+
+          exam:
+            item.candidate.exam.name,
+
+
+          center:
+            item.candidate.center.name,
+
+
+          operator:
+            item.operator.employeeCode,
+
+
+          device:
+            item.device.deviceCode,
+
+
+          verified:
+            item.verified,
+
+        }),
+
+      );
+
+
+
+
+
+
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(
+
+        rows,
+
+      );
+
+
+
+
+    const workbook =
+      XLSX.utils.book_new();
+
+
+
+
+    XLSX.utils.book_append_sheet(
+
+      workbook,
+
+      worksheet,
+
+      'Attendance',
+
+    );
+
+
+
+
+
+
+
+    return XLSX.write(
+
+      workbook,
+
+      {
+
+        type: 'buffer',
+
+        bookType: 'xlsx',
+
+      },
+
+    );
+
 
   }
 
