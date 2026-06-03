@@ -11,6 +11,7 @@ import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 
 
@@ -80,6 +81,8 @@ export default function Dashboard() {
 
 
   return (
+
+  <ProtectedRoute>
 
     <div className="flex">
 
@@ -154,7 +157,9 @@ export default function Dashboard() {
 
     </div>
 
-  );
+</ProtectedRoute>
+
+);
 
 
 }

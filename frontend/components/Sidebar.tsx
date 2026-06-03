@@ -1,65 +1,106 @@
 import Link from "next/link";
 
+import LogoutButton from "./LogoutButton";
+
+
 
 export default function Sidebar() {
 
 
   return (
 
-    <aside className="w-64 min-h-screen border-r p-5">
+    <aside className="w-64 min-h-screen border-r p-5 flex flex-col justify-between">
 
 
-      <h2 className="font-bold text-xl mb-8">
-
-        Exam System
-
-      </h2>
+      <div>
 
 
-      <nav className="flex flex-col gap-4">
+        <h2 className="font-bold text-xl mb-8">
+
+          Exam System
+
+        </h2>
 
 
-        <Link href="/dashboard">
-          Dashboard
-        </Link>
 
 
-        <Link href="/centers">
-          Centers
-        </Link>
+        <nav className="flex flex-col gap-4">
 
 
-        <Link href="/operators">
-          Operators
-        </Link>
+          <Link href="/dashboard">
+
+            Dashboard
+
+          </Link>
 
 
-        <Link href="/devices">
-          Devices
-        </Link>
+
+          <Link href="/centers">
+
+            Centers
+
+          </Link>
 
 
-        <Link href="/exams">
-          Exams
-        </Link>
+
+          <Link href="/operators">
+
+            Operators
+
+          </Link>
 
 
-        <Link href="/shifts">
-          Shifts
-        </Link>
+
+          <Link href="/devices">
+
+            Devices
+
+          </Link>
 
 
-        <Link href="/candidates">
-          Candidates
-        </Link>
+
+          <Link href="/exams">
+
+            Exams
+
+          </Link>
 
 
-        <Link href="/attendance">
-          Attendance
-        </Link>
+
+          <Link href="/shifts">
+
+            Shifts
+
+          </Link>
 
 
-      </nav>
+
+          <Link href="/candidates">
+
+            Candidates
+
+          </Link>
+
+
+
+          <Link href="/attendance">
+
+            Attendance
+
+          </Link>
+
+
+        </nav>
+
+
+      </div>
+
+
+
+
+
+      <LogoutButton />
+
 
 
     </aside>
