@@ -11,7 +11,10 @@ import api from "../../lib/api";
 
 
 import Sidebar from "../../components/Sidebar";
+
 import ProtectedRoute from "../../components/ProtectedRoute";
+
+
 
 
 
@@ -20,6 +23,7 @@ export default function Dashboard() {
 
   const [data, setData] =
     useState<any>(null);
+
 
 
 
@@ -42,11 +46,14 @@ export default function Dashboard() {
 
 
         setData(
+
           response.data,
+
         );
 
 
       };
+
 
 
 
@@ -59,16 +66,105 @@ export default function Dashboard() {
 
 
 
+
+
+
+  const downloadReport =
+    async () => {
+
+
+      const response =
+        await api.get(
+
+          "/reports/export",
+
+
+          {
+
+            responseType:
+
+              "blob",
+
+          },
+
+        );
+
+
+
+
+
+      const url =
+        window.URL.createObjectURL(
+
+          response.data,
+
+        );
+
+
+
+
+
+      const link =
+        document.createElement(
+
+          "a",
+
+        );
+
+
+
+
+      link.href =
+        url;
+
+
+
+      link.download =
+
+        "attendance-report.xlsx";
+
+
+
+
+      link.click();
+
+
+
+
+      window.URL.revokeObjectURL(
+
+        url,
+
+      );
+
+
+    };
+
+
+
+
+
+
+
+
+
+
   if (!data) {
 
 
     return (
 
-      <div>
+      <ProtectedRoute>
 
-        Loading...
 
-      </div>
+        <div>
+
+          Loading...
+
+        </div>
+
+
+      </ProtectedRoute>
 
     );
 
@@ -80,86 +176,119 @@ export default function Dashboard() {
 
 
 
+
+
+
   return (
 
-  <ProtectedRoute>
-
-    <div className="flex">
+    <ProtectedRoute>
 
 
-      <Sidebar />
+      <div className="flex">
 
 
-
-      <main className="p-10 flex-1">
-
-
-        <h1 className="text-3xl font-bold mb-8">
-
-          Admin Dashboard
-
-        </h1>
+        <Sidebar />
 
 
 
 
-        <div className="grid grid-cols-3 gap-5">
+        <main className="p-10 flex-1">
 
 
-          {
+          <h1 className="text-3xl font-bold mb-8">
 
-            Object.entries(data)
-              .map(
+            Admin Dashboard
 
-                ([key, value]) => (
-
-
-                  <div
-
-                    key={key}
-
-                    className="border rounded-xl p-5"
-
-                  >
-
-
-                    <p>
-
-                      {key}
-
-                    </p>
+          </h1>
 
 
 
-                    <h2 className="text-3xl font-bold">
-
-                      {String(value)}
-
-                    </h2>
 
 
-                  </div>
 
+
+          <button
+
+            className="border p-3 mb-8 font-bold"
+
+            onClick={downloadReport}
+
+          >
+
+            Download Attendance Report
+
+          </button>
+
+
+
+
+
+
+
+
+          <div className="grid grid-cols-3 gap-5">
+
+
+            {
+
+              Object.entries(data)
+
+                .map(
+
+                  ([key, value]) => (
+
+
+
+                    <div
+
+                      key={key}
+
+                      className="border rounded-xl p-5"
+
+                    >
+
+
+
+                      <p>
+
+                        {key}
+
+                      </p>
+
+
+
+
+                      <h2 className="text-3xl font-bold">
+
+                        {String(value)}
+
+                      </h2>
+
+
+
+                    </div>
+
+
+                  )
 
                 )
 
-              )
-
-          }
+            }
 
 
-        </div>
+          </div>
 
 
 
-      </main>
+        </main>
 
 
-    </div>
+      </div>
 
-</ProtectedRoute>
 
-);
+    </ProtectedRoute>
+
+  );
 
 
 }
