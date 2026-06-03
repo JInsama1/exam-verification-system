@@ -44,6 +44,11 @@ export default function Sidebar() {
         </Link>
 
 
+        <Link href="/shifts">
+          Shifts
+        </Link>
+
+
         <Link href="/candidates">
           Candidates
         </Link>
