@@ -1,8 +1,10 @@
 import {
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
+
 
 
 
@@ -17,6 +19,7 @@ export class CreateCandidateDto {
 
 
 
+
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -24,9 +27,11 @@ export class CreateCandidateDto {
 
 
 
+
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  photoUrl: string;
+  photoUrl?: string;
+
 
 
 
@@ -38,9 +43,11 @@ export class CreateCandidateDto {
 
 
 
+
   @IsUUID()
   @IsNotEmpty()
   shiftId: string;
+
 
 
 

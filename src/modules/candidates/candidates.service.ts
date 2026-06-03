@@ -4,6 +4,7 @@ import * as XLSX from 'xlsx';
 import {
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 
 
@@ -124,7 +125,41 @@ export class CandidatesService {
 
     }
 
+const existing =
+  await this.candidateRepository.findOne({
 
+    where: {
+
+      rollNumber:
+        dto.rollNumber,
+
+
+      exam: {
+
+        id:
+          exam.id,
+
+      },
+
+    },
+
+  });
+
+
+
+
+
+if (existing) {
+
+
+  throw new ConflictException(
+
+    'Candidate already exists',
+
+  );
+
+
+}
 
 
 
