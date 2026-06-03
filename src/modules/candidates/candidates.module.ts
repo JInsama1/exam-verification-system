@@ -1,18 +1,58 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import {
+  Module,
+} from '@nestjs/common';
 
 
-import { AuthModule } from '../auth/auth.module';
+import {
+  TypeOrmModule,
+} from '@nestjs/typeorm';
 
 
-import { Candidate } from '../../database/entities/candidate.entity';
-import { Exam } from '../../database/entities/exam.entity';
-import { Shift } from '../../database/entities/shift.entity';
-import { Center } from '../../database/entities/center.entity';
+import {
+  MulterModule,
+} from '@nestjs/platform-express';
 
 
-import { CandidatesService } from './candidates.service';
-import { CandidatesController } from './candidates.controller';
+
+import {
+  AuthModule,
+} from '../auth/auth.module';
+
+
+
+
+import {
+  Candidate,
+} from '../../database/entities/candidate.entity';
+
+
+import {
+  Exam,
+} from '../../database/entities/exam.entity';
+
+
+import {
+  Shift,
+} from '../../database/entities/shift.entity';
+
+
+import {
+  Center,
+} from '../../database/entities/center.entity';
+
+
+
+
+import {
+  CandidatesService,
+} from './candidates.service';
+
+
+import {
+  CandidatesController,
+} from './candidates.controller';
+
+
 
 
 
@@ -20,27 +60,58 @@ import { CandidatesController } from './candidates.controller';
 
   imports: [
 
+
     TypeOrmModule.forFeature([
+
       Candidate,
+
       Exam,
+
       Shift,
+
       Center,
+
     ]),
+
+
+
+
+    MulterModule.register({
+
+      dest: './uploads',
+
+    }),
+
+
 
 
     AuthModule,
 
+
   ],
+
+
+
 
 
   controllers: [
+
     CandidatesController,
+
   ],
+
+
+
 
 
   providers: [
+
     CandidatesService,
+
   ],
 
+
 })
+
+
 export class CandidatesModule {}

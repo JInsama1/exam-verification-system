@@ -72,11 +72,22 @@ export class AttendanceService {
 
 
     const operator =
-      await this.operatorRepository.findOne({
-        where: {
-          id: dto.operatorId,
-        },
-      });
+  await this.operatorRepository.findOne({
+
+    where: {
+
+      id: dto.operatorId,
+
+    },
+
+
+    relations: {
+
+      user: true,
+
+    },
+
+  });
 
 
 
