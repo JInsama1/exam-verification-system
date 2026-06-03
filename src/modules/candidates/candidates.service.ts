@@ -347,7 +347,37 @@ async uploadPhoto(
 
     }
 
+const existing =
+  await this.candidateRepository.findOne({
 
+    where: {
+
+      rollNumber:
+        row.rollNumber,
+
+
+      exam: {
+
+        id:
+          exam.id,
+
+      },
+
+    },
+
+  });
+
+
+
+
+
+if (existing) {
+
+
+  continue;
+
+
+}
 
 
 

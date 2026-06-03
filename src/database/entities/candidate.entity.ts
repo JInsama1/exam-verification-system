@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  Unique,
 } from 'typeorm';
 
 
@@ -15,6 +16,16 @@ import { Center } from './center.entity';
 
 
 @Entity('candidates')
+
+
+@Unique(
+  [
+    'rollNumber',
+    'exam',
+  ],
+)
+
+
 export class Candidate {
 
 
@@ -22,14 +33,15 @@ export class Candidate {
   id: string;
 
 
-  @Column({
-    unique: true,
-  })
+
+  @Column()
   rollNumber: string;
+
 
 
   @Column()
   name: string;
+
 
 
   @Column({
@@ -38,16 +50,20 @@ export class Candidate {
   photoUrl: string;
 
 
+
   @ManyToOne(() => Exam)
   exam: Exam;
+
 
 
   @ManyToOne(() => Shift)
   shift: Shift;
 
 
+
   @ManyToOne(() => Center)
   center: Center;
+
 
 
   @Column({
@@ -56,11 +72,14 @@ export class Candidate {
   verified: boolean;
 
 
+
   @CreateDateColumn()
   createdAt: Date;
 
 
+
   @UpdateDateColumn()
   updatedAt: Date;
+
 
 }
