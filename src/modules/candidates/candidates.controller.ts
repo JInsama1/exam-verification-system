@@ -1,11 +1,12 @@
 import {
+  Param,
+  UseInterceptors,
   Body,
   Controller,
   Get,
   Post,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 
 
@@ -144,7 +145,53 @@ export class CandidatesController {
 
 
 
+@Post(
+  ':id/photo',
+)
 
+
+@Roles(
+  Role.MASTER_ADMIN,
+  Role.ADMIN,
+)
+
+
+@UseInterceptors(
+
+  FileInterceptor(
+    'file',
+  ),
+
+)
+
+
+uploadPhoto(
+
+  @Param(
+    'id',
+  )
+
+  id: string,
+
+
+
+  @UploadedFile()
+
+  file: Express.Multer.File,
+
+) {
+
+
+  return this.candidatesService.uploadPhoto(
+
+    id,
+
+    file.filename,
+
+  );
+
+
+}
 
 
 

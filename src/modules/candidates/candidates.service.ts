@@ -166,7 +166,59 @@ export class CandidatesService {
 
 
 
+async uploadPhoto(
 
+  id: string,
+
+  filename: string,
+
+) {
+
+
+  const candidate =
+    await this.candidateRepository.findOne({
+
+      where: {
+
+        id,
+
+      },
+
+    });
+
+
+
+
+  if (!candidate) {
+
+
+    throw new NotFoundException(
+
+      'Candidate not found',
+
+    );
+
+
+  }
+
+
+
+
+  candidate.photoUrl =
+    `/uploads/${filename}`;
+
+
+
+
+
+  return this.candidateRepository.save(
+
+    candidate,
+
+  );
+
+
+}
 
 
 
