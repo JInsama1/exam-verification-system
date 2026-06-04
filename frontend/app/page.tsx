@@ -18,71 +18,86 @@ export default function Home() {
     useState("");
 
 
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+
+  const [loading, setLoading] =
+    useState(false);
+
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+
   const login = async () => {
 
 
-    const response =
-      await axios.post(
+    setError(null);
+    setLoading(true);
 
-        "http://localhost:3000/auth/login",
 
-        {
-          email,
-          password,
-        },
+    try {
 
+      const response =
+        await axios.post(
+          "http://localhost:3000/auth/login",
+          {
+            email,
+            password,
+          },
+        );
+
+
+      localStorage.setItem(
+        "token",
+        response.data.accessToken,
       );
 
 
-    localStorage.setItem(
-
-      "token",
-
-      response.data.accessToken,
-
-    );
-
-
-    const payload =
-  JSON.parse(
-
-    atob(
-
-      response.data.accessToken.split(".")[1],
-
-    ),
-
-  );
-
-console.log(
-  payload,
-);
+      const payload =
+        JSON.parse(
+          atob(
+            response.data.accessToken
+              .split(".")[1],
+          ),
+        );
 
 
+      if (payload.role === "operator") {
 
-if (
+        window.location.href = "/attendance";
 
-  payload.role === "operator"
+      } else {
 
-) {
+        window.location.href = "/dashboard";
 
-
-  window.location.href =
-    "/attendance";
-
-
-} else {
+      }
 
 
-  window.location.href =
-    "/dashboard";
+    } catch {
 
+      setError("Invalid email or password");
 
-}
+    } finally {
+
+      setLoading(false);
+
+    }
 
 
   };
 
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent,
+  ) => {
+
+    if (e.key === "Enter") {
+      login();
+    }
+
+  };
 
 
   return (
@@ -100,51 +115,54 @@ if (
         </h1>
 
 
-
         <input
-
           className="border p-2 w-full mb-3"
-
           placeholder="Email"
-
           value={email}
-
-          onChange={
-            e => setEmail(e.target.value)
-          }
-
+          onChange={e => setEmail(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
 
 
+        <div className="relative mb-3">
 
-        <input
+          <input
+            className="border p-2 w-full pr-16"
+            placeholder="Password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
 
-          className="border p-2 w-full mb-3"
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500"
+            onClick={() =>
+              setShowPassword(prev => !prev)
+            }
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
 
-          placeholder="Password"
+        </div>
 
-          type="password"
 
-          value={password}
-
-          onChange={
-            e => setPassword(e.target.value)
-          }
-
-        />
-
+        {
+          error && (
+            <p className="text-red-600 text-sm mb-3">
+              {error}
+            </p>
+          )
+        }
 
 
         <button
-
-          className="border p-2 w-full"
-
+          className="border p-2 w-full disabled:opacity-40"
           onClick={login}
-
+          disabled={loading}
         >
-
-          Login
-
+          {loading ? "Logging in..." : "Login"}
         </button>
 
 
