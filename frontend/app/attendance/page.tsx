@@ -32,7 +32,12 @@ export default function Attendance() {
   const [devices, setDevices] =
     useState<any[]>([]);
 
+const [message, setMessage] =
+  useState("");
 
+
+const [error, setError] =
+  useState("");
 
 
 
@@ -151,7 +156,17 @@ const selectedCandidate =
 
 
     const verify =
-    async () => {
+  async () => {
+
+
+    try {
+
+
+      setError("");
+
+      setMessage("");
+
+
 
 
       await api.post(
@@ -159,6 +174,15 @@ const selectedCandidate =
         "/attendance/verify",
 
         form,
+
+      );
+
+
+
+
+      setMessage(
+
+        "Candidate verified successfully",
 
       );
 
@@ -183,7 +207,22 @@ const selectedCandidate =
       await loadData();
 
 
-    };
+    } catch (err: any) {
+
+
+      setError(
+
+        err.response?.data?.message
+        ||
+        "Verification failed",
+
+      );
+
+
+    }
+
+
+  };
 
 
 
@@ -211,7 +250,35 @@ const selectedCandidate =
         </h1>
 
 
+{
 
+  message && (
+
+    <div className="border p-3 mb-5">
+
+      {message}
+
+    </div>
+
+  )
+
+}
+
+
+
+{
+
+  error && (
+
+    <div className="border p-3 mb-5">
+
+      {error}
+
+    </div>
+
+  )
+
+}
 
 
 
