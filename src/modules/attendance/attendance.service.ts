@@ -219,7 +219,9 @@ if (
 
 await this.auditService.log(
 
-  operator.user.id,
+  operator.user?.id
+  ||
+  operator.id,
 
   'VERIFY_CANDIDATE',
 
