@@ -176,6 +176,10 @@ export class ReportsService {
           verified:
             item.verified,
 
+
+          verifiedAt:
+            item.verifiedAt,
+
         }),
 
       );
