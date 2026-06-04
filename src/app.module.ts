@@ -41,6 +41,8 @@ import { AuditLog } from './database/entities/audit-log.entity';
 
 import { ImportJob } from './database/entities/import-job.entity';
 
+import { PersonIdentity } from './database/entities/person-identity.entity';
+
 
 
 
@@ -139,6 +141,8 @@ import { ImportModule } from './modules/import/import.module';
         AuditLog,
 
         ImportJob,
+
+        PersonIdentity,
 
       ],
 

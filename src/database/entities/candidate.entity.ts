@@ -12,6 +12,7 @@ import {
 import { Exam } from './exam.entity';
 import { Shift } from './shift.entity';
 import { Center } from './center.entity';
+import { PersonIdentity } from './person-identity.entity';
 
 
 
@@ -71,6 +72,13 @@ export class Candidate {
   })
   verified: boolean;
 
+
+  @ManyToOne(
+    () => PersonIdentity,
+    personIdentity => personIdentity.candidates,
+    { nullable: true },
+  )
+  personIdentity: PersonIdentity;
 
 
   @CreateDateColumn()
