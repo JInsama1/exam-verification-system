@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
-  OneToMany,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -13,8 +12,6 @@ import {
 
 import { User } from './user.entity';
 import { Center } from './center.entity';
-import { BiometricCapture } from './biometric-capture.entity';
-
 
 @Entity('operators')
 export class Operator {
@@ -52,11 +49,5 @@ export class Operator {
   @UpdateDateColumn()
   updatedAt: Date;
 
-
-  @OneToMany(
-    () => BiometricCapture,
-    capture => capture.operator,
-  )
-  captures: BiometricCapture[];
 
 }

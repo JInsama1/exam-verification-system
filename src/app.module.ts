@@ -45,6 +45,8 @@ import { PersonIdentity } from './database/entities/person-identity.entity';
 
 import { BiometricCapture } from './database/entities/biometric-capture.entity';
 
+import { FieldOperator } from './database/entities/field-operator.entity';
+
 
 
 
@@ -147,6 +149,8 @@ import { ImportModule } from './modules/import/import.module';
         PersonIdentity,
 
         BiometricCapture,
+
+        FieldOperator,
 
       ],
 

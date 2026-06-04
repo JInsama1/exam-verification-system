@@ -19,8 +19,8 @@ import {
 
 
 import {
-  Operator,
-} from './operator.entity';
+  FieldOperator,
+} from './field-operator.entity';
 
 
 import {
@@ -107,11 +107,11 @@ export class BiometricCapture {
 
 
   @ManyToOne(
-    () => Operator,
-    operator => operator.captures,
+    () => FieldOperator,
+    fieldOperator => fieldOperator.captures,
     { nullable: false },
   )
-  operator: Operator;
+  fieldOperator: FieldOperator;
 
 
   @ManyToOne(
