@@ -27,6 +27,21 @@ import {
 
 
 import {
+  Exam,
+} from '../../database/entities/exam.entity';
+
+
+import {
+  Center,
+} from '../../database/entities/center.entity';
+
+
+import {
+  Shift,
+} from '../../database/entities/shift.entity';
+
+
+import {
   ImportService,
 } from './import.service';
 
@@ -43,6 +58,9 @@ import {
     TypeOrmModule.forFeature([
       ImportJob,
       Project,
+      Exam,
+      Center,
+      Shift,
     ]),
 
     MulterModule.register({

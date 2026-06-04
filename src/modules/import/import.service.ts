@@ -13,6 +13,7 @@ import {
 
 
 import {
+  In,
   Repository,
 } from 'typeorm';
 
@@ -26,6 +27,21 @@ import {
 import {
   Project,
 } from '../../database/entities/project.entity';
+
+
+import {
+  Exam,
+} from '../../database/entities/exam.entity';
+
+
+import {
+  Center,
+} from '../../database/entities/center.entity';
+
+
+import {
+  Shift,
+} from '../../database/entities/shift.entity';
 
 
 const REQUIRED_COLUMNS = [
@@ -52,6 +68,18 @@ export class ImportService {
     @InjectRepository(Project)
     private projectRepository:
       Repository<Project>,
+
+    @InjectRepository(Exam)
+    private examRepository:
+      Repository<Exam>,
+
+    @InjectRepository(Center)
+    private centerRepository:
+      Repository<Center>,
+
+    @InjectRepository(Shift)
+    private shiftRepository:
+      Repository<Shift>,
 
   ) {}
 
@@ -160,6 +188,10 @@ export class ImportService {
           id: jobId,
         },
 
+        relations: {
+          project: true,
+        },
+
       });
 
 
@@ -179,6 +211,8 @@ export class ImportService {
 
     try {
 
+
+      // ── Parse Excel ───────────────────────
 
       const workbook =
         XLSX.readFile(job.filePath);
@@ -223,6 +257,8 @@ export class ImportService {
       }
 
 
+      // ── Column validation ─────────────────
+
       const firstRow =
         rows[0] as Record<string, unknown>;
 
@@ -252,8 +288,278 @@ export class ImportService {
       }
 
 
-      // Steps 6–7: hierarchy upsert and
-      // candidate batch insert go here.
+      // ── Extract unique hierarchy ──────────
+      //
+      // Single pass through rows.
+      // No database queries inside this loop.
+
+      const today =
+        new Date().toISOString().split('T')[0];
+
+
+      const uniqueExams = new Map<
+        string,
+        {
+          examCode: string;
+          name: string;
+          startDate: string;
+          endDate: string;
+        }
+      >();
+
+
+      const uniqueCenters = new Map<
+        string,
+        {
+          centerCode: string;
+          name: string;
+          address: string;
+          city: string;
+          state: string;
+        }
+      >();
+
+
+      const uniqueShifts = new Map<
+        string,
+        {
+          examCode: string;
+          shiftName: string;
+          startTime: string;
+          endTime: string;
+        }
+      >();
+
+
+      for (const row of rows) {
+
+
+        if (!uniqueExams.has(row.examCode)) {
+
+          uniqueExams.set(
+            row.examCode,
+            {
+              examCode:  row.examCode,
+              name:      row.examName,
+              startDate: row.examStartDate || today,
+              endDate:   row.examEndDate   || today,
+            },
+          );
+
+        }
+
+
+        if (!uniqueCenters.has(row.centerCode)) {
+
+          uniqueCenters.set(
+            row.centerCode,
+            {
+              centerCode: row.centerCode,
+              name:       row.centerName,
+              address:    row.centerAddress || '',
+              city:       row.centerCity    || '',
+              state:      row.centerState   || '',
+            },
+          );
+
+        }
+
+
+        const shiftKey =
+          `${row.examCode}|${row.shiftName}`;
+
+
+        if (!uniqueShifts.has(shiftKey)) {
+
+          uniqueShifts.set(
+            shiftKey,
+            {
+              examCode:  row.examCode,
+              shiftName: row.shiftName,
+              startTime: row.shiftStartTime || '00:00',
+              endTime:   row.shiftEndTime   || '23:59',
+            },
+          );
+
+        }
+
+
+      }
+
+
+      // ── Upsert Exams ──────────────────────
+
+      const existingExams =
+        await this.examRepository.find({
+
+          where: {
+            project: { id: job.project.id },
+          },
+
+        });
+
+
+      const examsMap = new Map<string, Exam>(
+        existingExams.map(
+          e => [e.examCode, e],
+        ),
+      );
+
+
+      const examsToCreate =
+        [...uniqueExams.values()]
+          .filter(e => !examsMap.has(e.examCode))
+          .map(e =>
+            this.examRepository.create({
+              examCode:  e.examCode,
+              name:      e.name,
+              startDate: e.startDate,
+              endDate:   e.endDate,
+              project:   job.project,
+            }),
+          );
+
+
+      if (examsToCreate.length > 0) {
+
+        const created =
+          await this.examRepository.save(
+            examsToCreate,
+          );
+
+        created.forEach(
+          e => examsMap.set(e.examCode, e),
+        );
+
+      }
+
+
+      // ── Upsert Centers ────────────────────
+
+      const existingCenters =
+        await this.centerRepository.find({
+
+          where: {
+            project: { id: job.project.id },
+          },
+
+        });
+
+
+      const centersMap = new Map<string, Center>(
+        existingCenters.map(
+          c => [c.centerCode, c],
+        ),
+      );
+
+
+      const centersToCreate =
+        [...uniqueCenters.values()]
+          .filter(c => !centersMap.has(c.centerCode))
+          .map(c =>
+            this.centerRepository.create({
+              centerCode: c.centerCode,
+              name:       c.name,
+              address:    c.address,
+              city:       c.city,
+              state:      c.state,
+              project:    job.project,
+            }),
+          );
+
+
+      if (centersToCreate.length > 0) {
+
+        const created =
+          await this.centerRepository.save(
+            centersToCreate,
+          );
+
+        created.forEach(
+          c => centersMap.set(c.centerCode, c),
+        );
+
+      }
+
+
+      // ── Upsert Shifts ─────────────────────
+
+      const examIds =
+        [...examsMap.values()].map(e => e.id);
+
+
+      const existingShifts =
+        examIds.length > 0
+          ? await this.shiftRepository.find({
+
+              where: {
+                exam: { id: In(examIds) },
+              },
+
+              relations: {
+                exam: true,
+              },
+
+            })
+          : [];
+
+
+      const shiftsMap = new Map<string, Shift>(
+        existingShifts.map(
+          s => [`${s.exam.examCode}|${s.name}`, s],
+        ),
+      );
+
+
+      const newShiftDrafts =
+        [...uniqueShifts.entries()]
+          .filter(([key]) => !shiftsMap.has(key))
+          .map(([, s]) => ({
+            draft: s,
+            exam:  examsMap.get(s.examCode),
+          }))
+          .filter(
+            (item): item is {
+              draft: typeof item.draft;
+              exam: Exam;
+            } => item.exam !== undefined,
+          );
+
+
+      if (newShiftDrafts.length > 0) {
+
+        const entities =
+          newShiftDrafts.map(({ draft, exam }) =>
+            this.shiftRepository.create({
+              name:      draft.shiftName,
+              startTime: draft.startTime,
+              endTime:   draft.endTime,
+              exam,
+            }),
+          );
+
+
+        const created =
+          await this.shiftRepository.save(
+            entities,
+          );
+
+
+        created.forEach((shift, i) => {
+
+          const { draft } = newShiftDrafts[i];
+
+          shiftsMap.set(
+            `${draft.examCode}|${draft.shiftName}`,
+            shift,
+          );
+
+        });
+
+      }
+
+
+      // ── Step 7: candidate batch insert ────
 
 
       await this.importJobRepository.update(
@@ -277,7 +583,7 @@ export class ImportService {
           errors: [{
             reason:
               err?.message ??
-              'Failed to read Excel file',
+              'Failed to process import',
           }],
         },
       );
