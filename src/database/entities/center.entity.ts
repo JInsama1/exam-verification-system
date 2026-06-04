@@ -4,19 +4,29 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  Unique,
 } from 'typeorm';
 
 
+import {
+  Project,
+} from './project.entity';
+
+
 @Entity('centers')
+@Unique([
+  'centerCode',
+  'project',
+])
 export class Center {
+
 
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
 
-  @Column({
-    unique: true,
-  })
+  @Column()
   centerCode: string;
 
 
@@ -36,6 +46,13 @@ export class Center {
   state: string;
 
 
+  @ManyToOne(
+    () => Project,
+    { nullable: false },
+  )
+  project: Project;
+
+
   @Column({
     default: true,
   })
@@ -48,4 +65,6 @@ export class Center {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+
 }

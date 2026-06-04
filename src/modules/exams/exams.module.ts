@@ -1,25 +1,48 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from '../auth/auth.module';
 
 
-import { Exam } from '../../database/entities/exam.entity';
+import {
+  TypeOrmModule,
+} from '@nestjs/typeorm';
 
 
-import { ExamsService } from './exams.service';
-import { ExamsController } from './exams.controller';
+import {
+  AuthModule,
+} from '../auth/auth.module';
+
+
+import {
+  Exam,
+} from '../../database/entities/exam.entity';
+
+
+import {
+  Project,
+} from '../../database/entities/project.entity';
+
+
+import {
+  ExamsService,
+} from './exams.service';
+
+
+import {
+  ExamsController,
+} from './exams.controller';
 
 
 @Module({
+
   imports: [
 
-  TypeOrmModule.forFeature([
-    Exam,
-  ]),
+    TypeOrmModule.forFeature([
+      Exam,
+      Project,
+    ]),
 
-  AuthModule,
+    AuthModule,
 
-],
+  ],
 
 
   controllers: [
@@ -30,6 +53,7 @@ import { ExamsController } from './exams.controller';
   providers: [
     ExamsService,
   ],
+
 
 })
 export class ExamsModule {}

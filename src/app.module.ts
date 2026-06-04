@@ -21,6 +21,8 @@ import { databaseConfig } from './config/database.config';
 
 import { User } from './database/entities/user.entity';
 
+import { Project } from './database/entities/project.entity';
+
 import { Center } from './database/entities/center.entity';
 
 import { Operator } from './database/entities/operator.entity';
@@ -44,6 +46,8 @@ import { AuthModule } from './modules/auth/auth.module';
 
 import { UsersModule } from './modules/users/users.module';
 
+import { ProjectsModule } from './modules/projects/projects.module';
+
 import { CentersModule } from './modules/centers/centers.module';
 
 import { OperatorsModule } from './modules/operators/operators.module';
@@ -61,7 +65,6 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
 import { ReportsModule } from './modules/reports/reports.module';
 
 import { AuditModule } from './modules/audit/audit.module';
-
 
 
 
@@ -104,8 +107,6 @@ import { AuditModule } from './modules/audit/audit.module';
 
 
 
-
-
     TypeOrmModule.forRoot({
 
       ...databaseConfig,
@@ -114,6 +115,8 @@ import { AuditModule } from './modules/audit/audit.module';
       entities: [
 
         User,
+
+        Project,
 
         Center,
 
@@ -138,12 +141,13 @@ import { AuditModule } from './modules/audit/audit.module';
 
 
 
-
-
     AuthModule,
 
 
     UsersModule,
+
+
+    ProjectsModule,
 
 
     CentersModule,

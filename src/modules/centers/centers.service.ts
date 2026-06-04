@@ -1,17 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 
-import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import {
+  InjectRepository,
+} from '@nestjs/typeorm';
 
 
-import { Center } from '../../database/entities/center.entity';
+import {
+  Repository,
+} from 'typeorm';
 
-import { CreateCenterDto } from './dto/create-center.dto';
+
+import {
+  Center,
+} from '../../database/entities/center.entity';
+
+
+import {
+  Project,
+} from '../../database/entities/project.entity';
+
+
+import {
+  CreateCenterDto,
+} from './dto/create-center.dto';
 
 
 @Injectable()
 export class CentersService {
+
 
   constructor(
 
@@ -19,26 +40,91 @@ export class CentersService {
     private readonly centerRepository:
       Repository<Center>,
 
+    @InjectRepository(Project)
+    private readonly projectRepository:
+      Repository<Project>,
+
   ) {}
 
 
-  create(dto: CreateCenterDto) {
+  async create(dto: CreateCenterDto) {
+
+
+    const project =
+      await this.projectRepository.findOne({
+
+        where: {
+          id: dto.projectId,
+        },
+
+      });
+
+
+    if (!project) {
+
+      throw new NotFoundException(
+        'Project not found',
+      );
+
+    }
+
+
+    const existing =
+      await this.centerRepository.findOne({
+
+        where: {
+          centerCode: dto.centerCode,
+          project: { id: project.id },
+        },
+
+      });
+
+
+    if (existing) {
+
+      throw new ConflictException(
+        'Center code already exists in this project',
+      );
+
+    }
+
+
+    const {
+      projectId,
+      ...centerData
+    } = dto;
+
 
     const center =
-      this.centerRepository.create(dto);
+      this.centerRepository.create({
+        ...centerData,
+        project,
+      });
 
 
-    return this.centerRepository.save(
-      center,
-    );
+    return this.centerRepository.save(center);
+
 
   }
 
 
   findAll() {
 
-    return this.centerRepository.find();
+
+    return this.centerRepository.find({
+
+      relations: {
+        project: true,
+      },
+
+      order: {
+        createdAt: 'DESC',
+      },
+
+    });
+
 
   }
+
 
 }

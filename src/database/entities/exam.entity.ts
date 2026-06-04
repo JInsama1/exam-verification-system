@@ -4,10 +4,21 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  Unique,
 } from 'typeorm';
 
 
+import {
+  Project,
+} from './project.entity';
+
+
 @Entity('exams')
+@Unique([
+  'examCode',
+  'project',
+])
 export class Exam {
 
 
@@ -15,14 +26,19 @@ export class Exam {
   id: string;
 
 
-  @Column({
-    unique: true,
-  })
+  @Column()
   examCode: string;
 
 
   @Column()
   name: string;
+
+
+  @ManyToOne(
+    () => Project,
+    { nullable: false },
+  )
+  project: Project;
 
 
   @Column({
@@ -49,5 +65,6 @@ export class Exam {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
 
 }

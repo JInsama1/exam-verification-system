@@ -12,23 +12,18 @@ import {
 
 
 import {
-  Center,
-} from '../../database/entities/center.entity';
-
-
-import {
   Project,
 } from '../../database/entities/project.entity';
 
 
 import {
-  CentersService,
-} from './centers.service';
+  ProjectsService,
+} from './projects.service';
 
 
 import {
-  CentersController,
-} from './centers.controller';
+  ProjectsController,
+} from './projects.controller';
 
 
 @Module({
@@ -36,7 +31,6 @@ import {
   imports: [
 
     TypeOrmModule.forFeature([
-      Center,
       Project,
     ]),
 
@@ -46,14 +40,19 @@ import {
 
 
   controllers: [
-    CentersController,
+    ProjectsController,
   ],
 
 
   providers: [
-    CentersService,
+    ProjectsService,
+  ],
+
+
+  exports: [
+    ProjectsService,
   ],
 
 
 })
-export class CentersModule {}
+export class ProjectsModule {}
