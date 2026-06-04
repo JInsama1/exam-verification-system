@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  Unique,
 } from 'typeorm';
 
 
@@ -12,6 +13,10 @@ import { Exam } from './exam.entity';
 
 
 @Entity('shifts')
+@Unique([
+  'name',
+  'exam',
+])
 export class Shift {
 
 

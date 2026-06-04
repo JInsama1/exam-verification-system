@@ -39,6 +39,8 @@ import { Attendance } from './database/entities/attendance.entity';
 
 import { AuditLog } from './database/entities/audit-log.entity';
 
+import { ImportJob } from './database/entities/import-job.entity';
+
 
 
 
@@ -65,6 +67,8 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
 import { ReportsModule } from './modules/reports/reports.module';
 
 import { AuditModule } from './modules/audit/audit.module';
+
+import { ImportModule } from './modules/import/import.module';
 
 
 
@@ -134,6 +138,8 @@ import { AuditModule } from './modules/audit/audit.module';
 
         AuditLog,
 
+        ImportJob,
+
       ],
 
     }),
@@ -175,6 +181,9 @@ import { AuditModule } from './modules/audit/audit.module';
 
 
     AuditModule,
+
+
+    ImportModule,
 
 
   ],
