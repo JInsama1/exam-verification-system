@@ -13,6 +13,11 @@ import {
 } from './candidate.entity';
 
 
+import {
+  BiometricCapture,
+} from './biometric-capture.entity';
+
+
 @Entity('person_identities')
 export class PersonIdentity {
 
@@ -46,6 +51,13 @@ export class PersonIdentity {
     candidate => candidate.personIdentity,
   )
   candidates: Candidate[];
+
+
+  @OneToMany(
+    () => BiometricCapture,
+    capture => capture.personIdentity,
+  )
+  captures: BiometricCapture[];
 
 
   @CreateDateColumn()

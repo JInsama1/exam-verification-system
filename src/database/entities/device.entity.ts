@@ -5,10 +5,16 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 
 import { Center } from './center.entity';
+
+
+import {
+  BiometricCapture,
+} from './biometric-capture.entity';
 
 
 @Entity('devices')
@@ -51,5 +57,12 @@ export class Device {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+
+  @OneToMany(
+    () => BiometricCapture,
+    capture => capture.device,
+  )
+  captures: BiometricCapture[];
 
 }

@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   Unique,
 } from 'typeorm';
 
@@ -13,6 +14,7 @@ import { Exam } from './exam.entity';
 import { Shift } from './shift.entity';
 import { Center } from './center.entity';
 import { PersonIdentity } from './person-identity.entity';
+import { BiometricCapture } from './biometric-capture.entity';
 
 
 
@@ -88,6 +90,13 @@ export class Candidate {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+
+  @OneToMany(
+    () => BiometricCapture,
+    capture => capture.candidate,
+  )
+  captures: BiometricCapture[];
 
 
 }

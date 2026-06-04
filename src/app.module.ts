@@ -43,6 +43,8 @@ import { ImportJob } from './database/entities/import-job.entity';
 
 import { PersonIdentity } from './database/entities/person-identity.entity';
 
+import { BiometricCapture } from './database/entities/biometric-capture.entity';
+
 
 
 
@@ -143,6 +145,8 @@ import { ImportModule } from './modules/import/import.module';
         ImportJob,
 
         PersonIdentity,
+
+        BiometricCapture,
 
       ],
 
