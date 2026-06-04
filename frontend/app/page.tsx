@@ -43,8 +43,42 @@ export default function Home() {
     );
 
 
-    window.location.href =
-  "/dashboard";
+    const payload =
+  JSON.parse(
+
+    atob(
+
+      response.data.accessToken.split(".")[1],
+
+    ),
+
+  );
+
+console.log(
+  payload,
+);
+
+
+
+if (
+
+  payload.role === "operator"
+
+) {
+
+
+  window.location.href =
+    "/attendance";
+
+
+} else {
+
+
+  window.location.href =
+    "/dashboard";
+
+
+}
 
 
   };
