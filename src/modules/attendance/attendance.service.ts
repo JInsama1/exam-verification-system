@@ -233,8 +233,13 @@ await this.auditService.log(
       candidate.name,
 
 
-    deviceId:
-      device.id,
+    operatorCode:
+      operator.employeeCode,
+
+
+    deviceCode:
+      device.deviceCode,
+
 
   },
 
