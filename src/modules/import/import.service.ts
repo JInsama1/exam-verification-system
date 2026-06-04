@@ -1,6 +1,6 @@
 import {
   Injectable,
-  NotImplementedException,
+  NotFoundException,
 } from '@nestjs/common';
 
 
@@ -16,6 +16,7 @@ import {
 
 import {
   ImportJob,
+  ImportJobStatus,
 } from '../../database/entities/import-job.entity';
 
 
@@ -44,9 +45,49 @@ export class ImportService {
   async create(
     projectId: string,
     file: Express.Multer.File,
-  ): Promise<ImportJob> {
+  ): Promise<{
+    jobId: string;
+    status: ImportJobStatus;
+  }> {
 
-    throw new NotImplementedException();
+
+    const project =
+      await this.projectRepository.findOne({
+
+        where: {
+          id: projectId,
+        },
+
+      });
+
+
+    if (!project) {
+
+      throw new NotFoundException(
+        'Project not found',
+      );
+
+    }
+
+
+    const job =
+      this.importJobRepository.create({
+        project,
+        filePath: file.path,
+      });
+
+
+    const saved =
+      await this.importJobRepository.save(
+        job,
+      );
+
+
+    return {
+      jobId: saved.id,
+      status: saved.status,
+    };
+
 
   }
 
@@ -55,7 +96,28 @@ export class ImportService {
     id: string,
   ): Promise<ImportJob> {
 
-    throw new NotImplementedException();
+
+    const job =
+      await this.importJobRepository.findOne({
+
+        where: {
+          id,
+        },
+
+      });
+
+
+    if (!job) {
+
+      throw new NotFoundException(
+        'Import job not found',
+      );
+
+    }
+
+
+    return job;
+
 
   }
 
