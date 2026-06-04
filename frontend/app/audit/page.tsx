@@ -10,7 +10,12 @@ import {
 import Sidebar from "../../components/Sidebar";
 
 
+import ProtectedRoute from "../../components/ProtectedRoute";
+
+
 import api from "../../lib/api";
+
+
 
 
 
@@ -24,6 +29,9 @@ export default function AuditPage() {
 
 
 
+
+
+
   useEffect(() => {
 
 
@@ -33,17 +41,23 @@ export default function AuditPage() {
 
         const response =
           await api.get(
+
             "/audit",
+
           );
 
 
 
+
         setLogs(
+
           response.data,
+
         );
 
 
       };
+
 
 
 
@@ -58,146 +72,226 @@ export default function AuditPage() {
 
 
 
+
+
   return (
 
-    <div className="flex">
+    <ProtectedRoute>
 
 
-      <Sidebar />
+      <div className="flex">
 
 
-
-      <main className="p-10 flex-1">
-
-
-        <h1 className="text-3xl font-bold mb-8">
-
-          Audit Logs
-
-        </h1>
+        <Sidebar />
 
 
 
 
-
-
-        <table className="w-full border">
-
-
-  <thead>
-
-    <tr>
-
-      <th className="border p-2">
-        Action
-      </th>
-
-      <th className="border p-2">
-        User
-      </th>
-
-      <th className="border p-2">
-        Candidate
-      </th>
-
-      <th className="border p-2">
-        Time
-      </th>
-
-    </tr>
-
-  </thead>
+        <main className="p-10 flex-1">
 
 
 
+          <h1 className="text-3xl font-bold mb-8">
 
+            Audit Logs
 
-  <tbody>
-
-
-    {
-
-      logs.map(
-
-        log => (
-
-
-          <tr key={log.id}>
-
-
-            <td className="border p-2">
-
-              {log.action}
-
-            </td>
-
-
-
-
-
-            <td className="border p-2">
-
-              {log.userId}
-
-            </td>
+          </h1>
 
 
 
 
 
 
-            <td className="border p-2">
+
+
+          <table className="w-full border">
+
+
+            <thead>
+
+
+              <tr>
+
+
+                <th className="border p-2">
+
+                  Action
+
+                </th>
+
+
+
+                <th className="border p-2">
+
+                  Operator
+
+                </th>
+
+
+
+
+                <th className="border p-2">
+
+                  Device
+
+                </th>
+
+
+
+
+                <th className="border p-2">
+
+                  Candidate
+
+                </th>
+
+
+
+
+                <th className="border p-2">
+
+                  Time
+
+                </th>
+
+
+              </tr>
+
+
+            </thead>
+
+
+
+
+
+
+
+
+            <tbody>
+
 
               {
 
-                log.details?.candidateName
+                logs.map(
+
+                  log => (
+
+
+                    <tr key={log.id}>
+
+
+                      <td className="border p-2">
+
+                        {log.action}
+
+                      </td>
+
+
+
+
+
+
+
+                      <td className="border p-2">
+
+                        {
+
+                          log.details?.operatorCode
+                            ||
+                          "-"
+
+                        }
+
+                      </td>
+
+
+
+
+
+
+
+
+                      <td className="border p-2">
+
+                        {
+
+                          log.details?.deviceCode
+                            ||
+                          "-"
+
+                        }
+
+                      </td>
+
+
+
+
+
+
+
+
+                      <td className="border p-2">
+
+                        {
+
+                          log.details?.candidateName
+                            ||
+                          "-"
+
+                        }
+
+                      </td>
+
+
+
+
+
+
+
+
+
+                      <td className="border p-2">
+
+                        {
+
+                          new Date(
+
+                            log.createdAt,
+
+                          ).toLocaleString()
+
+                        }
+
+                      </td>
+
+
+
+
+
+                    </tr>
+
+
+                  )
+
+                )
 
               }
 
-            </td>
+
+            </tbody>
+
+
+          </table>
 
 
 
+        </main>
 
 
-
-            <td className="border p-2">
-
-              {
-
-                new Date(
-
-                  log.createdAt,
-
-                ).toLocaleString()
-
-              }
-
-            </td>
+      </div>
 
 
-
-          </tr>
-
-
-        )
-
-      )
-
-    }
-
-
-  </tbody>
-
-
-</table>
-
-
-
-      </main>
-
-
-    </div>
+    </ProtectedRoute>
 
   );
 
