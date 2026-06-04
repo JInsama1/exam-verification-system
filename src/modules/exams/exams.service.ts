@@ -89,15 +89,12 @@ export class ExamsService {
     }
 
 
-    const {
-      projectId,
-      ...examData
-    } = dto;
-
-
     const exam =
       this.examRepository.create({
-        ...examData,
+        examCode: dto.examCode,
+        name: dto.name,
+        startDate: dto.startDate,
+        endDate: dto.endDate,
         project,
       });
 

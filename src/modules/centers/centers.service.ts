@@ -89,15 +89,13 @@ export class CentersService {
     }
 
 
-    const {
-      projectId,
-      ...centerData
-    } = dto;
-
-
     const center =
       this.centerRepository.create({
-        ...centerData,
+        centerCode: dto.centerCode,
+        name: dto.name,
+        address: dto.address,
+        city: dto.city,
+        state: dto.state,
         project,
       });
 
