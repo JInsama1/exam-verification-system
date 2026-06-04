@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
+  Index,
 } from 'typeorm';
 
 
@@ -87,14 +88,16 @@ export class BiometricCapture {
   overrideReason: string;
 
 
+  @Index()
   @ManyToOne(
     () => PersonIdentity,
     personIdentity => personIdentity.captures,
-    { nullable: true },
+    { nullable: false },
   )
   personIdentity: PersonIdentity;
 
 
+  @Index()
   @ManyToOne(
     () => Candidate,
     candidate => candidate.captures,
@@ -119,6 +122,7 @@ export class BiometricCapture {
   device: Device;
 
 
+  @Index()
   @CreateDateColumn()
   createdAt: Date;
 
