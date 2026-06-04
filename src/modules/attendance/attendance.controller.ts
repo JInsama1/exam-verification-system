@@ -90,9 +90,10 @@ export class AttendanceController {
 
 
   @Roles(
-    Role.ADMIN,
-    Role.MASTER_ADMIN,
-  )
+  Role.MASTER_ADMIN,
+  Role.ADMIN,
+  Role.OPERATOR,
+)
 
 
   findAll() {

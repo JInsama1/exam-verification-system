@@ -56,9 +56,10 @@ export class DevicesController {
 
   @Get()
   @Roles(
-    Role.MASTER_ADMIN,
-    Role.ADMIN,
-  )
+  Role.MASTER_ADMIN,
+  Role.ADMIN,
+  Role.OPERATOR,
+)
   findAll() {
 
     return this.devicesService.findAll();

@@ -39,9 +39,10 @@ export class OperatorsController {
 
   @Post()
   @Roles(
-    Role.MASTER_ADMIN,
-    Role.ADMIN,
-  )
+  Role.MASTER_ADMIN,
+  Role.ADMIN,
+  Role.OPERATOR,
+)
   create(
     @Body() dto: CreateOperatorDto,
   ) {
@@ -56,9 +57,10 @@ export class OperatorsController {
 
   @Get()
   @Roles(
-    Role.MASTER_ADMIN,
-    Role.ADMIN,
-  )
+  Role.MASTER_ADMIN,
+  Role.ADMIN,
+  Role.OPERATOR,
+)
   findAll() {
 
     return this.operatorsService.findAll();
