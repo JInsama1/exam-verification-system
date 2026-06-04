@@ -23,9 +23,9 @@ export default function LogoutButton() {
     );
 
 
-    router.push(
-      "/",
-    );
+    router.replace(
+  "/",
+);
 
 
   };
