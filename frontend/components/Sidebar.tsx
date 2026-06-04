@@ -1,10 +1,86 @@
+"use client";
+
+
 import Link from "next/link";
+
+
+import {
+  jwtDecode,
+} from "jwt-decode";
+
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
 
 import LogoutButton from "./LogoutButton";
 
 
 
+
+
 export default function Sidebar() {
+
+
+  const [role, setRole] =
+    useState("");
+
+
+
+
+
+  useEffect(() => {
+
+
+    const token =
+      localStorage.getItem(
+        "token",
+      );
+
+
+
+    if (token) {
+
+
+      const decoded: any =
+        jwtDecode(
+          token,
+        );
+
+
+
+      setRole(
+        decoded.role,
+      );
+
+
+    }
+
+
+  }, []);
+
+
+
+
+
+
+
+
+  const isAdmin =
+
+    role === "master_admin"
+
+    ||
+
+    role === "admin";
+
+
+
+
+
+
 
 
   return (
@@ -24,62 +100,89 @@ export default function Sidebar() {
 
 
 
+
         <nav className="flex flex-col gap-4">
 
 
-          <Link href="/dashboard">
 
-            Dashboard
+          {
 
-          </Link>
+            isAdmin && (
 
-
-
-          <Link href="/centers">
-
-            Centers
-
-          </Link>
+              <>
 
 
+                <Link href="/dashboard">
 
-          <Link href="/operators">
+                  Dashboard
 
-            Operators
-
-          </Link>
+                </Link>
 
 
 
-          <Link href="/devices">
+                <Link href="/centers">
 
-            Devices
+                  Centers
 
-          </Link>
-
-
-
-          <Link href="/exams">
-
-            Exams
-
-          </Link>
+                </Link>
 
 
 
-          <Link href="/shifts">
+                <Link href="/operators">
 
-            Shifts
+                  Operators
 
-          </Link>
+                </Link>
 
 
 
-          <Link href="/candidates">
+                <Link href="/devices">
 
-            Candidates
+                  Devices
 
-          </Link>
+                </Link>
+
+
+
+                <Link href="/exams">
+
+                  Exams
+
+                </Link>
+
+
+
+                <Link href="/shifts">
+
+                  Shifts
+
+                </Link>
+
+
+
+                <Link href="/candidates">
+
+                  Candidates
+
+                </Link>
+
+
+
+                <Link href="/audit">
+
+                  Audit Logs
+
+                </Link>
+
+
+              </>
+
+            )
+
+          }
+
+
+
 
 
 
@@ -89,11 +192,6 @@ export default function Sidebar() {
 
           </Link>
 
-          <Link href="/audit">
-
-            Audit Logs
-
-          </Link>
 
 
         </nav>
