@@ -203,35 +203,35 @@ export class ImportService {
   ): Promise<void> {
 
 
-    const job =
-      await this.importJobRepository.findOne({
-
-        where: {
-          id: jobId,
-        },
-
-        relations: {
-          project: true,
-        },
-
-      });
-
-
-    if (!job) {
-      return;
-    }
-
-
-    await this.importJobRepository.update(
-      jobId,
-      {
-        status: ImportJobStatus.PROCESSING,
-        startedAt: new Date(),
-      },
-    );
-
-
     try {
+
+
+      const job =
+        await this.importJobRepository.findOne({
+
+          where: {
+            id: jobId,
+          },
+
+          relations: {
+            project: true,
+          },
+
+        });
+
+
+      if (!job) {
+        return;
+      }
+
+
+      await this.importJobRepository.update(
+        jobId,
+        {
+          status: ImportJobStatus.PROCESSING,
+          startedAt: new Date(),
+        },
+      );
 
 
       // ── Parse Excel ───────────────────────
@@ -356,6 +356,19 @@ export class ImportService {
       for (const row of rows) {
 
 
+        if (
+          !row.examCode    ||
+          !row.examName    ||
+          !row.centerCode  ||
+          !row.centerName  ||
+          !row.shiftName   ||
+          !row.rollNumber  ||
+          !row.name
+        ) {
+          continue;
+        }
+
+
         if (!uniqueExams.has(row.examCode)) {
 
           uniqueExams.set(
@@ -388,7 +401,7 @@ export class ImportService {
 
 
         const shiftKey =
-          `${row.examCode}|${row.shiftName}`;
+          `${row.examCode}\x00${row.shiftName}`;
 
 
         if (!uniqueShifts.has(shiftKey)) {
@@ -528,7 +541,7 @@ export class ImportService {
 
       const shiftsMap = new Map<string, Shift>(
         existingShifts.map(
-          s => [`${s.exam.examCode}|${s.name}`, s],
+          s => [`${s.exam.examCode}\x00${s.name}`, s],
         ),
       );
 
@@ -572,7 +585,7 @@ export class ImportService {
           const { draft } = newShiftDrafts[i];
 
           shiftsMap.set(
-            `${draft.examCode}|${draft.shiftName}`,
+            `${draft.examCode}\x00${draft.shiftName}`,
             shift,
           );
 
@@ -631,10 +644,24 @@ export class ImportService {
       for (const row of rows) {
 
 
+        if (
+          !row.rollNumber  ||
+          !row.name        ||
+          !row.examCode    ||
+          !row.examName    ||
+          !row.centerCode  ||
+          !row.centerName  ||
+          !row.shiftName
+        ) {
+          failedCount++;
+          continue;
+        }
+
+
         const exam   = examsMap.get(row.examCode);
         const center = centersMap.get(row.centerCode);
         const shift  = shiftsMap.get(
-          `${row.examCode}|${row.shiftName}`,
+          `${row.examCode}\x00${row.shiftName}`,
         );
 
 
@@ -720,18 +747,24 @@ export class ImportService {
     } catch (err: any) {
 
 
-      await this.importJobRepository.update(
-        jobId,
-        {
-          status: ImportJobStatus.FAILED,
-          completedAt: new Date(),
-          errors: [{
-            reason:
-              err?.message ??
-              'Failed to process import',
-          }],
-        },
-      );
+      try {
+
+        await this.importJobRepository.update(
+          jobId,
+          {
+            status: ImportJobStatus.FAILED,
+            completedAt: new Date(),
+            errors: [{
+              reason:
+                err?.message ??
+                'Failed to process import',
+            }],
+          },
+        );
+
+      } catch {
+        // Database unavailable — cannot persist failure state.
+      }
 
 
     }
