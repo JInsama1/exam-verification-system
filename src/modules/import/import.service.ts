@@ -44,6 +44,24 @@ import {
 } from '../../database/entities/shift.entity';
 
 
+import {
+  Candidate,
+} from '../../database/entities/candidate.entity';
+
+
+const CHUNK_SIZE = 5000;
+
+
+type CandidateBatch = {
+  rollNumber: string;
+  name: string;
+  photoUrl: string | null;
+  exam: Exam;
+  shift: Shift;
+  center: Center;
+};
+
+
 const REQUIRED_COLUMNS = [
   'rollNumber',
   'name',
@@ -80,6 +98,10 @@ export class ImportService {
     @InjectRepository(Shift)
     private shiftRepository:
       Repository<Shift>,
+
+    @InjectRepository(Candidate)
+    private candidateRepository:
+      Repository<Candidate>,
 
   ) {}
 
@@ -559,15 +581,138 @@ export class ImportService {
       }
 
 
-      // ── Step 7: candidate batch insert ────
+      // ── Load existing candidate keys ──────
+      //
+      // One query to pre-build a duplicate Set.
+      // All checks during the row loop are O(1).
 
+      const existingKeys = new Set<string>();
+
+
+      if (examIds.length > 0) {
+
+        const existing =
+          await this.candidateRepository
+            .createQueryBuilder('c')
+            .innerJoin('c.exam', 'exam')
+            .where(
+              'exam.id IN (:...examIds)',
+              { examIds },
+            )
+            .select('c.rollNumber', 'rollNumber')
+            .addSelect('exam.id', 'examId')
+            .getRawMany<{
+              rollNumber: string;
+              examId: string;
+            }>();
+
+        existing.forEach(r =>
+          existingKeys.add(
+            `${r.rollNumber}|${r.examId}`,
+          ),
+        );
+
+      }
+
+
+      // ── Candidate batch insert ────────────
+      //
+      // No database queries inside this loop.
+      // Rows are accumulated into chunks of
+      // CHUNK_SIZE and bulk-inserted together.
+
+      let createdCount = 0;
+      let skippedCount = 0;
+      let failedCount  = 0;
+
+      const chunk: CandidateBatch[] = [];
+
+
+      for (const row of rows) {
+
+
+        const exam   = examsMap.get(row.examCode);
+        const center = centersMap.get(row.centerCode);
+        const shift  = shiftsMap.get(
+          `${row.examCode}|${row.shiftName}`,
+        );
+
+
+        if (!exam || !center || !shift) {
+          failedCount++;
+          continue;
+        }
+
+
+        const key =
+          `${row.rollNumber}|${exam.id}`;
+
+
+        if (existingKeys.has(key)) {
+          skippedCount++;
+          continue;
+        }
+
+
+        existingKeys.add(key);
+
+
+        chunk.push({
+          rollNumber: row.rollNumber,
+          name:       row.name,
+          photoUrl:   row.photoUrl || null,
+          exam,
+          shift,
+          center,
+        });
+
+
+        if (chunk.length >= CHUNK_SIZE) {
+
+          await this.insertCandidateChunk(chunk);
+
+          createdCount += chunk.length;
+          chunk.length = 0;
+
+          await this.importJobRepository.update(
+            jobId,
+            {
+              processedRows:
+                createdCount +
+                skippedCount +
+                failedCount,
+              createdCount,
+              skippedCount,
+              failedCount,
+            },
+          );
+
+        }
+
+
+      }
+
+
+      if (chunk.length > 0) {
+
+        await this.insertCandidateChunk(chunk);
+
+        createdCount += chunk.length;
+
+      }
+
+
+      // ── Mark completed ────────────────────
 
       await this.importJobRepository.update(
         jobId,
         {
-          status: ImportJobStatus.COMPLETED,
+          status:       ImportJobStatus.COMPLETED,
           processedRows: totalRows,
-          completedAt: new Date(),
+          createdCount,
+          skippedCount,
+          failedCount,
+          completedAt:  new Date(),
         },
       );
 
@@ -591,6 +736,29 @@ export class ImportService {
 
     }
 
+
+  }
+
+
+  private async insertCandidateChunk(
+    chunk: CandidateBatch[],
+  ): Promise<void> {
+
+    await this.candidateRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Candidate)
+      .values(
+        chunk.map(c => ({
+          rollNumber: c.rollNumber,
+          name:       c.name,
+          photoUrl:   c.photoUrl ?? undefined,
+          exam:       { id: c.exam.id },
+          shift:      { id: c.shift.id },
+          center:     { id: c.center.id },
+        })),
+      )
+      .execute();
 
   }
 

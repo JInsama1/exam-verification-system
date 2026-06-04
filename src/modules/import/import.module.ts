@@ -42,6 +42,11 @@ import {
 
 
 import {
+  Candidate,
+} from '../../database/entities/candidate.entity';
+
+
+import {
   ImportService,
 } from './import.service';
 
@@ -61,6 +66,7 @@ import {
       Exam,
       Center,
       Shift,
+      Candidate,
     ]),
 
     MulterModule.register({
