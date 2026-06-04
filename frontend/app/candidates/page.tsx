@@ -609,7 +609,27 @@ export default function Candidates() {
 
                   </td>
 
+<td className="border p-2">
 
+  {c.exam?.name || "-"}
+
+</td>
+
+
+
+<td className="border p-2">
+
+  {c.shift?.name || "-"}
+
+</td>
+
+
+
+<td className="border p-2">
+
+  {c.center?.name || "-"}
+
+</td>
 
 
 
