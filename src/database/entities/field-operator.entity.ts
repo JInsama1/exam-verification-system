@@ -41,7 +41,14 @@ export class FieldOperator {
   @Column({
     default: false,
   })
-  phoneVerified: boolean;
+  phoneValid: boolean;
+
+
+  @Column({
+    type: 'jsonb',
+    nullable: true,
+  })
+  phoneValidationData: any;
 
 
   @Column({

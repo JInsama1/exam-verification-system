@@ -106,6 +106,7 @@ export class BiometricCapture {
   candidate: Candidate;
 
 
+  @Index()
   @ManyToOne(
     () => FieldOperator,
     fieldOperator => fieldOperator.captures,
