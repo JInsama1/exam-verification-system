@@ -35,6 +35,8 @@ export enum BiometricCaptureType {
 
 
 @Index(['fieldOperator', 'type', 'createdAt'])
+@Index(['candidate', 'type', 'createdAt'])
+@Index(['type', 'matchScore', 'createdAt'])
 @Entity('biometric_captures')
 export class BiometricCapture {
 

@@ -82,6 +82,8 @@ import { BiometricsModule } from './modules/biometrics/biometrics.module';
 
 import { TabletModule } from './modules/tablet/tablet.module';
 
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
+
 
 
 
@@ -211,6 +213,9 @@ import { TabletModule } from './modules/tablet/tablet.module';
 
 
     TabletModule,
+
+
+    MonitoringModule,
 
 
   ],
