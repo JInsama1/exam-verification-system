@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 
 
@@ -74,6 +75,21 @@ export class FieldOperator {
     default: true,
   })
   isActive: boolean;
+
+
+  // Nullable so existing rows are not broken on migration
+  @Column({
+    nullable: true,
+    select:   false,
+  })
+  sessionTokenHash: string;
+
+
+  @Index()
+  @Column({
+    nullable: true,
+  })
+  lastLoginAt: Date;
 
 
   @OneToMany(

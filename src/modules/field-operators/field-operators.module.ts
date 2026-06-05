@@ -17,6 +17,16 @@ import {
 
 
 import {
+  Device,
+} from '../../database/entities/device.entity';
+
+
+import {
+  BiometricCapture,
+} from '../../database/entities/biometric-capture.entity';
+
+
+import {
   FieldOperatorsService,
 } from './field-operators.service';
 
@@ -32,6 +42,8 @@ import {
 
     TypeOrmModule.forFeature([
       FieldOperator,
+      Device,
+      BiometricCapture,
     ]),
 
     MulterModule.register({

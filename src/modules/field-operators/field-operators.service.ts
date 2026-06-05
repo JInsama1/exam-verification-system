@@ -1,5 +1,8 @@
 import {
+  ForbiddenException,
   Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 
@@ -14,6 +17,13 @@ import {
 
 
 import {
+  createHash,
+  randomBytes,
+  timingSafeEqual,
+} from 'crypto';
+
+
+import {
   unlink,
 } from 'fs/promises';
 
@@ -24,8 +34,31 @@ import {
 
 
 import {
+  Device,
+  DeviceStatus,
+} from '../../database/entities/device.entity';
+
+
+import {
+  BiometricCapture,
+  BiometricCaptureType,
+} from '../../database/entities/biometric-capture.entity';
+
+
+import {
   RegisterFieldOperatorDto,
 } from './dto/register-field-operator.dto';
+
+import {
+  LoginFieldOperatorDto,
+} from './dto/login-field-operator.dto';
+
+import {
+  OperatorMeDto,
+} from './dto/operator-me.dto';
+
+
+const MATCH_THRESHOLD = 80;
 
 
 async function deleteFileSafe(
@@ -43,6 +76,24 @@ async function deleteFileSafe(
 }
 
 
+function generateToken(): string {
+  return randomBytes(32).toString('hex');
+}
+
+
+function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
+}
+
+
+function secureCompare(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a, 'hex');
+  const bBuf = Buffer.from(b, 'hex');
+  if (aBuf.length !== bBuf.length) return false;
+  return timingSafeEqual(aBuf, bBuf);
+}
+
+
 @Injectable()
 export class FieldOperatorsService {
 
@@ -52,6 +103,14 @@ export class FieldOperatorsService {
     @InjectRepository(FieldOperator)
     private fieldOperatorRepository:
       Repository<FieldOperator>,
+
+    @InjectRepository(Device)
+    private deviceRepository:
+      Repository<Device>,
+
+    @InjectRepository(BiometricCapture)
+    private captureRepository:
+      Repository<BiometricCapture>,
 
   ) {}
 
@@ -181,6 +240,159 @@ export class FieldOperatorsService {
 
     }
 
+
+  }
+
+
+  async login(
+    dto: LoginFieldOperatorDto,
+  ): Promise<{
+    operatorId:    string;
+    operatorToken: string;
+  }> {
+
+    const operator =
+      await this.fieldOperatorRepository.findOne({
+        where: {
+          phone:    dto.phone,
+          isActive: true,
+        },
+      });
+
+    if (!operator) {
+      throw new UnauthorizedException(
+        'Operator not found or inactive',
+      );
+    }
+
+    const rawToken  = generateToken();
+    const tokenHash = hashToken(rawToken);
+
+    await this.fieldOperatorRepository.update(
+      operator.id,
+      {
+        sessionTokenHash: tokenHash,
+        lastLoginAt:      new Date(),
+      },
+    );
+
+    // operatorToken is returned only here — never stored in plaintext
+    return {
+      operatorId:    operator.id,
+      operatorToken: rawToken,
+    };
+
+  }
+
+
+  async me(
+    dto: OperatorMeDto,
+  ) {
+
+    // Load sessionTokenHash explicitly — it is select:false by default
+    const operator = await this.fieldOperatorRepository
+      .createQueryBuilder('fo')
+      .addSelect('fo.sessionTokenHash')
+      .where('fo.id = :id', { id: dto.operatorId })
+      .getOne();
+
+    if (!operator) {
+      throw new NotFoundException('Operator not found');
+    }
+
+    if (!operator.isActive) {
+      throw new ForbiddenException('Operator is inactive');
+    }
+
+    if (
+      !operator.sessionTokenHash ||
+      !secureCompare(
+        hashToken(dto.operatorToken),
+        operator.sessionTokenHash,
+      )
+    ) {
+      throw new UnauthorizedException('Invalid operator token');
+    }
+
+
+    const [
+      activatedDevices,
+      totalEnrollments,
+      totalVerifications,
+      failedVerifications,
+      lastActivityRow,
+    ] = await Promise.all([
+
+      // Devices activated by this operator that are currently ACTIVE
+      this.deviceRepository.find({
+        where: {
+          activatedBy: { id: operator.id },
+          status:      DeviceStatus.ACTIVE,
+        },
+        relations: { center: true },
+      }),
+
+      // All enrollment captures by this operator
+      this.captureRepository
+        .createQueryBuilder('cap')
+        .innerJoin('cap.fieldOperator', 'operator')
+        .where('operator.id = :opId', { opId: operator.id })
+        .andWhere('cap.type = :type', { type: BiometricCaptureType.ENROLLMENT })
+        .getCount(),
+
+      // All verification captures by this operator
+      this.captureRepository
+        .createQueryBuilder('cap')
+        .innerJoin('cap.fieldOperator', 'operator')
+        .where('operator.id = :opId', { opId: operator.id })
+        .andWhere('cap.type = :type', { type: BiometricCaptureType.VERIFICATION })
+        .getCount(),
+
+      // Verification captures that failed threshold
+      this.captureRepository
+        .createQueryBuilder('cap')
+        .innerJoin('cap.fieldOperator', 'operator')
+        .where('operator.id = :opId', { opId: operator.id })
+        .andWhere('cap.type = :type', { type: BiometricCaptureType.VERIFICATION })
+        .andWhere(
+          '(cap.matchScore IS NULL OR cap.matchScore < :threshold)',
+          { threshold: MATCH_THRESHOLD },
+        )
+        .getCount(),
+
+      // Most recent capture timestamp — source of truth for last activity
+      this.captureRepository
+        .createQueryBuilder('cap')
+        .select('MAX(cap.createdAt)', 'lastActivityAt')
+        .innerJoin('cap.fieldOperator', 'operator')
+        .where('operator.id = :opId', { opId: operator.id })
+        .getRawOne<{ lastActivityAt: Date | null }>(),
+
+    ]);
+
+
+    return {
+      operator: {
+        id:          operator.id,
+        name:        operator.name,
+        phone:       operator.phone,
+        phoneValid:  operator.phoneValid,
+        selfieUrl:   operator.selfieUrl,
+        idProofType: operator.idProofType,
+        idProofUrl:  operator.idProofUrl,
+        isActive:    operator.isActive,
+        lastLoginAt: operator.lastLoginAt,
+        createdAt:   operator.createdAt,
+        updatedAt:   operator.updatedAt,
+      },
+      activatedDevices,
+      stats: {
+        totalEnrollments,
+        totalVerifications,
+        failedVerifications,
+        lastActivityAt: lastActivityRow?.lastActivityAt ?? null,
+      },
+    };
 
   }
 

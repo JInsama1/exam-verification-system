@@ -21,6 +21,14 @@ import {
   RegisterFieldOperatorDto,
 } from './dto/register-field-operator.dto';
 
+import {
+  LoginFieldOperatorDto,
+} from './dto/login-field-operator.dto';
+
+import {
+  OperatorMeDto,
+} from './dto/operator-me.dto';
+
 
 @Controller('field-operators')
 export class FieldOperatorsController {
@@ -90,6 +98,22 @@ export class FieldOperatorsController {
       files.idProof?.[0],
     );
 
+  }
+
+
+  @Post('login')
+  login(
+    @Body() dto: LoginFieldOperatorDto,
+  ) {
+    return this.fieldOperatorsService.login(dto);
+  }
+
+
+  @Post('me')
+  me(
+    @Body() dto: OperatorMeDto,
+  ) {
+    return this.fieldOperatorsService.me(dto);
   }
 
 
