@@ -37,19 +37,38 @@ export class FieldOperatorsController {
   @Post('register')
   @UseInterceptors(
 
-    FileFieldsInterceptor([
+    FileFieldsInterceptor(
+      [
 
+        {
+          name:     'selfie',
+          maxCount: 1,
+        },
+
+        {
+          name:     'idProof',
+          maxCount: 1,
+        },
+
+      ],
       {
-        name:     'selfie',
-        maxCount: 1,
+        limits: {
+          fileSize: 5 * 1024 * 1024,
+        },
+        fileFilter: (
+          _req: any,
+          file: Express.Multer.File,
+          cb: (error: Error | null, acceptFile: boolean) => void,
+        ) => {
+          const allowed = [
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+          ];
+          cb(null, allowed.includes(file.mimetype));
+        },
       },
-
-      {
-        name:     'idProof',
-        maxCount: 1,
-      },
-
-    ]),
+    ),
 
   )
   register(

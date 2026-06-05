@@ -14,6 +14,11 @@ import {
 
 
 import {
+  unlink,
+} from 'fs/promises';
+
+
+import {
   FieldOperator,
 } from '../../database/entities/field-operator.entity';
 
@@ -21,6 +26,21 @@ import {
 import {
   RegisterFieldOperatorDto,
 } from './dto/register-field-operator.dto';
+
+
+async function deleteFileSafe(
+  filePath: string | undefined,
+): Promise<void> {
+
+  if (!filePath) return;
+
+  try {
+    await unlink(filePath);
+  } catch {
+    // ignore cleanup errors
+  }
+
+}
 
 
 @Injectable()
@@ -59,6 +79,9 @@ export class FieldOperatorsService {
 
 
     if (existing) {
+
+      await deleteFileSafe(selfieFile?.path);
+      await deleteFileSafe(idProofFile?.path);
 
       return {
         fieldOperatorId: existing.id,
@@ -102,17 +125,61 @@ export class FieldOperatorsService {
     }
 
 
-    const saved =
-      await this.fieldOperatorRepository.save(
-        fieldOperator,
-      );
+    try {
 
 
-    return {
-      fieldOperatorId: saved.id,
-      name:            saved.name,
-      phone:           saved.phone,
-    };
+      const saved =
+        await this.fieldOperatorRepository.save(
+          fieldOperator,
+        );
+
+
+      return {
+        fieldOperatorId: saved.id,
+        name:            saved.name,
+        phone:           saved.phone,
+      };
+
+
+    } catch (err: any) {
+
+
+      if (err?.code === '23505') {
+
+
+        const raceExisting =
+          await this.fieldOperatorRepository.findOne({
+
+            where: {
+              phone:    dto.phone,
+              isActive: true,
+            },
+
+          });
+
+
+        await deleteFileSafe(selfieFile?.path);
+        await deleteFileSafe(idProofFile?.path);
+
+
+        if (!raceExisting) {
+          throw err;
+        }
+
+        return {
+          fieldOperatorId: raceExisting.id,
+          name:            raceExisting.name,
+          phone:           raceExisting.phone,
+        };
+
+
+      }
+
+
+      throw err;
+
+
+    }
 
 
   }
