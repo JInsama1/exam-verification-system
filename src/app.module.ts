@@ -76,6 +76,8 @@ import { AuditModule } from './modules/audit/audit.module';
 
 import { ImportModule } from './modules/import/import.module';
 
+import { FieldOperatorsModule } from './modules/field-operators/field-operators.module';
+
 
 
 
@@ -196,6 +198,9 @@ import { ImportModule } from './modules/import/import.module';
 
 
     ImportModule,
+
+
+    FieldOperatorsModule,
 
 
   ],
