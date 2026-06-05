@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   Unique,
+  Index,
 } from 'typeorm';
 
 
@@ -54,6 +55,7 @@ export class Candidate {
 
 
 
+  @Index()
   @ManyToOne(() => Exam)
   exam: Exam;
 
@@ -64,6 +66,7 @@ export class Candidate {
 
 
 
+  @Index()
   @ManyToOne(() => Center)
   center: Center;
 

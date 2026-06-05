@@ -80,6 +80,8 @@ import { FieldOperatorsModule } from './modules/field-operators/field-operators.
 
 import { BiometricsModule } from './modules/biometrics/biometrics.module';
 
+import { TabletModule } from './modules/tablet/tablet.module';
+
 
 
 
@@ -206,6 +208,9 @@ import { BiometricsModule } from './modules/biometrics/biometrics.module';
 
 
     BiometricsModule,
+
+
+    TabletModule,
 
 
   ],
