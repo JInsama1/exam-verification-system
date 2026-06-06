@@ -6,6 +6,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
+import { Throttle } from '@nestjs/throttler';
+
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
@@ -24,6 +26,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async login(
     @Body() loginDto: LoginDto,
   ) {

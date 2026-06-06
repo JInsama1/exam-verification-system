@@ -4,6 +4,8 @@ import {
   Post,
 } from '@nestjs/common';
 
+import { Throttle } from '@nestjs/throttler';
+
 
 import { DevicesService } from './devices.service';
 
@@ -23,6 +25,7 @@ export class DeviceTabletController {
 
 
   @Post('activate')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   activate(
     @Body() dto: ActivateDeviceDto,
   ) {

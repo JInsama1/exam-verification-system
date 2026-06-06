@@ -6,6 +6,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 
+import { Throttle } from '@nestjs/throttler';
+
 
 import {
   FileFieldsInterceptor,
@@ -43,6 +45,7 @@ export class FieldOperatorsController {
 
 
   @Post('register')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @UseInterceptors(
 
     FileFieldsInterceptor(
@@ -102,6 +105,7 @@ export class FieldOperatorsController {
 
 
   @Post('login')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   login(
     @Body() dto: LoginFieldOperatorDto,
   ) {

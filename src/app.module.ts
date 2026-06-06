@@ -1,6 +1,13 @@
 import { Module } from '@nestjs/common';
 
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import {
+  ThrottlerModule,
+  ThrottlerGuard,
+} from '@nestjs/throttler';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -90,6 +97,10 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
 
 import { SyncModule } from './modules/sync/sync.module';
 
+import { HealthModule } from './modules/health/health.module';
+
+import { AuditInterceptor } from './common/interceptors/audit.interceptor';
+
 
 
 
@@ -103,6 +114,23 @@ import { SyncModule } from './modules/sync/sync.module';
       isGlobal: true,
 
       validationSchema: envValidationSchema,
+
+    }),
+
+
+    ThrottlerModule.forRootAsync({
+
+      imports: [ConfigModule],
+
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => [
+        {
+          name: 'default',
+          ttl: configService.get<number>('THROTTLE_TTL', 60) * 1000,
+          limit: configService.get<number>('THROTTLE_LIMIT', 120),
+        },
+      ],
 
     }),
 
@@ -238,6 +266,18 @@ import { SyncModule } from './modules/sync/sync.module';
 
     SyncModule,
 
+
+    HealthModule,
+
+
+  ],
+
+
+  providers: [
+
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
 
   ],
 

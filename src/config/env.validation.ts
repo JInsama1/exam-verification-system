@@ -19,4 +19,7 @@ export const envValidationSchema = Joi.object({
   CORS_ORIGINS: Joi.string().default(
     'http://localhost:3000,http://localhost:3001',
   ),
+
+  THROTTLE_TTL: Joi.number().default(60),
+  THROTTLE_LIMIT: Joi.number().default(120),
 });
