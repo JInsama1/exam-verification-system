@@ -46,6 +46,21 @@ import {
 } from './biometrics.controller';
 
 
+import {
+  BiometricMatcherService,
+} from './biometric-matcher.service';
+
+
+import {
+  FingerprintMatcher,
+} from './matchers/fingerprint.matcher';
+
+
+import {
+  IrisMatcher,
+} from './matchers/iris.matcher';
+
+
 @Module({
 
   imports: [
@@ -71,6 +86,9 @@ import {
 
 
   providers: [
+    FingerprintMatcher,
+    IrisMatcher,
+    BiometricMatcherService,
     BiometricsService,
   ],
 

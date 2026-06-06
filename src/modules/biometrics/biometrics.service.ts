@@ -57,6 +57,11 @@ import {
 } from './dto/verify-biometric.dto';
 
 
+import {
+  BiometricMatcherService,
+} from './biometric-matcher.service';
+
+
 const MATCH_THRESHOLD = 80;
 
 
@@ -75,35 +80,6 @@ async function deleteFileSafe(
 }
 
 
-function computeMatchScore(
-  submittedFingerprint: string | undefined,
-  storedFingerprint:   string | null | undefined,
-  submittedIris:       string | undefined,
-  storedIris:          string | null | undefined,
-): number {
-
-  const scores: number[] = [];
-
-  if (submittedFingerprint && storedFingerprint) {
-    scores.push(
-      submittedFingerprint === storedFingerprint ? 100 : 30,
-    );
-  }
-
-  if (submittedIris && storedIris) {
-    scores.push(
-      submittedIris === storedIris ? 100 : 30,
-    );
-  }
-
-  if (scores.length === 0) return 0;
-
-  return Math.round(
-    scores.reduce((sum, s) => sum + s, 0) / scores.length,
-  );
-
-}
-
 
 @Injectable()
 export class BiometricsService {
@@ -117,6 +93,9 @@ export class BiometricsService {
 
     @InjectDataSource()
     private dataSource: DataSource,
+
+    private readonly biometricMatcherService:
+      BiometricMatcherService,
 
   ) {}
 
@@ -306,6 +285,40 @@ export class BiometricsService {
       }
 
 
+      // Load candidate before opening transaction to extract stored templates
+      const candidateForMatching =
+        await this.dataSource
+          .getRepository(Candidate)
+          .findOne({
+            where:     { id: dto.candidateId },
+            relations: { personIdentity: true },
+          });
+
+      if (!candidateForMatching) {
+        throw new NotFoundException(
+          `Candidate ${dto.candidateId} not found`,
+        );
+      }
+
+      if (!candidateForMatching.personIdentity) {
+        await deleteFileSafe(faceFile?.path);
+        return {
+          status:      'NOT_ENROLLED',
+          candidateId: candidateForMatching.id,
+        };
+      }
+
+
+      // Matcher call runs outside the transaction — no DB lock held during SDK I/O
+      const matchScore =
+        await this.biometricMatcherService.computeScore({
+          submittedFingerprint: dto.fingerprintTemplate,
+          storedFingerprint:    candidateForMatching.personIdentity.fingerprintTemplate,
+          submittedIris:        dto.irisTemplate,
+          storedIris:           candidateForMatching.personIdentity.irisTemplate,
+        });
+
+
       const result =
         await this.dataSource.transaction(
           async (manager): Promise<{
@@ -333,22 +346,6 @@ export class BiometricsService {
                 `Candidate ${dto.candidateId} not found`,
               );
             }
-
-
-            if (!candidate.personIdentity) {
-              return {
-                status:      'NOT_ENROLLED',
-                candidateId: candidate.id,
-              };
-            }
-
-
-            const matchScore = computeMatchScore(
-              dto.fingerprintTemplate,
-              candidate.personIdentity.fingerprintTemplate,
-              dto.irisTemplate,
-              candidate.personIdentity.irisTemplate,
-            );
 
 
             let device: Device | null = null;
@@ -407,10 +404,6 @@ export class BiometricsService {
           },
         );
 
-
-      if (result.status === 'NOT_ENROLLED') {
-        await deleteFileSafe(faceFile?.path);
-      }
 
       return result;
 
