@@ -18,6 +18,11 @@ import {
 } from './biometric-capture.entity';
 
 
+import {
+  BiometricTemplate,
+} from './biometric-template.entity';
+
+
 @Entity('person_identities')
 export class PersonIdentity {
 
@@ -58,6 +63,13 @@ export class PersonIdentity {
     capture => capture.personIdentity,
   )
   captures: BiometricCapture[];
+
+
+  @OneToMany(
+    () => BiometricTemplate,
+    template => template.personIdentity,
+  )
+  biometricTemplates: BiometricTemplate[];
 
 
   @CreateDateColumn()

@@ -35,10 +35,26 @@ import {
   Device,
 } from '../../database/entities/device.entity';
 
+import {
+  BiometricDeviceModel,
+} from '../../database/entities/biometric-device-model.entity';
+
+import {
+  BiometricTemplate,
+} from '../../database/entities/biometric-template.entity';
+
+import {
+  BiometricPolicy,
+} from '../../database/entities/biometric-policy.entity';
+
 
 import {
   BiometricsService,
 } from './biometrics.service';
+
+import {
+  BiometricPolicyService,
+} from './services/biometric-policy.service';
 
 
 import {
@@ -49,6 +65,27 @@ import {
 import {
   BiometricMatcherModule,
 } from './biometric-matcher.module';
+
+import {
+  AuditModule,
+} from '../audit/audit.module';
+
+
+import {
+  MantraAdapter,
+} from './devices/adapters/mantra.adapter';
+
+import {
+  MorphoAdapter,
+} from './devices/adapters/morpho.adapter';
+
+import {
+  StartekAdapter,
+} from './devices/adapters/startek.adapter';
+
+import {
+  IrisAdapter,
+} from './devices/adapters/iris.adapter';
 
 
 @Module({
@@ -61,6 +98,9 @@ import {
       Candidate,
       FieldOperator,
       Device,
+      BiometricDeviceModel,
+      BiometricTemplate,
+      BiometricPolicy,
     ]),
 
     MulterModule.register({
@@ -68,6 +108,8 @@ import {
     }),
 
     BiometricMatcherModule,
+
+    AuditModule,
 
   ],
 
@@ -79,6 +121,15 @@ import {
 
   providers: [
     BiometricsService,
+    BiometricPolicyService,
+    MantraAdapter,
+    MorphoAdapter,
+    StartekAdapter,
+    IrisAdapter,
+  ],
+
+  exports: [
+    BiometricPolicyService,
   ],
 
 

@@ -69,6 +69,17 @@ import {
   BiometricMatcherService,
 } from '../biometrics/biometric-matcher.service';
 
+import {
+  BiometricModality,
+  BiometricPosition,
+  TemplateFormat,
+} from '../../common/enums/biometric-modality.enum';
+
+import {
+  BiometricPolicy,
+  DEFAULT_BIOMETRIC_POLICY,
+} from '../../database/entities/biometric-policy.entity';
+
 
 import {
   DownloadPackageDto,
@@ -165,6 +176,9 @@ export class SyncService {
     @InjectRepository(OfflineSyncJob)
     private syncJobRepo: Repository<OfflineSyncJob>,
 
+    @InjectRepository(BiometricPolicy)
+    private policyRepo: Repository<BiometricPolicy>,
+
     @InjectDataSource()
     private dataSource: DataSource,
 
@@ -218,6 +232,10 @@ export class SyncService {
     shift:          { id: string; name: string } | null;
     center:         { id: string; centerCode: string; name: string };
     candidateCount: number;
+    policy: {
+      fingerprints: BiometricPosition[];
+      iris:         BiometricPosition[];
+    };
     candidates: {
       id:                  string;
       rollNumber:          string;
@@ -225,6 +243,13 @@ export class SyncService {
       photoUrl:            string | null;
       fingerprintTemplate: EncryptedTemplate;
       irisTemplate:        EncryptedTemplate;
+      templates: {
+        modality:          BiometricModality;
+        position:          BiometricPosition | null;
+        templateFormat:    TemplateFormat;
+        encryptedTemplate: EncryptedTemplate;
+        qualityScore:      number | null;
+      }[];
     }[];
   }> {
 
@@ -246,6 +271,13 @@ export class SyncService {
       );
     }
 
+    // Load the biometric capture policy for this project, falling back to the
+    // built-in default if none has been configured yet.
+    const policyRow = await this.policyRepo.findOne({
+      where: { project: { id: exam.project.id } },
+    });
+    const policy = policyRow ?? DEFAULT_BIOMETRIC_POLICY;
+
     let shift: Shift | null = null;
 
     if (dto.shiftId) {
@@ -264,6 +296,10 @@ export class SyncService {
     const qb = this.candidateRepo
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.personIdentity', 'pi')
+      .leftJoinAndSelect(
+        'pi.biometricTemplates', 'bt',
+        'bt.active = :btActive', { btActive: true },
+      )
       .innerJoin('c.center', 'center')
       .innerJoin('c.exam',   'exam')
       .where('center.id = :centerId', { centerId })
@@ -304,19 +340,34 @@ export class SyncService {
         name:       device.center.name,
       },
       candidateCount: candidates.length,
+      policy: {
+        fingerprints: policy.requiredFingerprints,
+        iris:         policy.requiredIris,
+      },
       candidates: candidates.map(c => ({
         id:         c.id,
         rollNumber: c.rollNumber,
         name:       c.name,
         photoUrl:   c.photoUrl ?? null,
-        // Templates are AES-256-GCM encrypted with a key derived from the
-        // device's own token; only the requesting device can decrypt them.
+        // Legacy single-template fields — kept for backward compatibility
+        // with tablet app versions that do not yet consume the templates array.
         fingerprintTemplate: c.personIdentity?.fingerprintTemplate
           ? encryptTemplate(c.personIdentity.fingerprintTemplate, packageKey)
           : null,
         irisTemplate: c.personIdentity?.irisTemplate
           ? encryptTemplate(c.personIdentity.irisTemplate, packageKey)
           : null,
+        // Universal multi-template array — empty for candidates enrolled before
+        // Phase 8.2; tablet should prefer this over the legacy fields when non-empty.
+        templates: (c.personIdentity?.biometricTemplates ?? []).map(bt => ({
+          modality:          bt.modality,
+          position:          bt.position  ?? null,
+          templateFormat:    bt.templateFormat,
+          encryptedTemplate: bt.templateData
+            ? encryptTemplate(bt.templateData, packageKey)
+            : null,
+          qualityScore:      bt.qualityScore ?? null,
+        })),
       })),
     };
 

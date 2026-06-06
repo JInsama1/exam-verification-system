@@ -58,6 +58,18 @@ import { FieldOperator } from './database/entities/field-operator.entity';
 
 import { OfflineSyncJob } from './database/entities/offline-sync-job.entity';
 
+import {
+  BiometricDeviceModel,
+} from './database/entities/biometric-device-model.entity';
+
+import {
+  BiometricTemplate,
+} from './database/entities/biometric-template.entity';
+
+import {
+  BiometricPolicy,
+} from './database/entities/biometric-policy.entity';
+
 
 
 
@@ -203,6 +215,12 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
         FieldOperator,
 
         OfflineSyncJob,
+
+        BiometricDeviceModel,
+
+        BiometricTemplate,
+
+        BiometricPolicy,
 
       ],
 

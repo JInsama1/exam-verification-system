@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 
 import helmet from 'helmet';
 
-import * as compression from 'compression';
+import compression from 'compression';
 
 import {
   ClassSerializerInterceptor,
@@ -54,6 +54,8 @@ async function bootstrap() {
     }),
   );
 
+
+  app.enableShutdownHooks();
 
   await app.listen(process.env.PORT ?? 3000);
 
