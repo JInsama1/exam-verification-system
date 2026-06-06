@@ -118,9 +118,14 @@ export class BiometricCapture {
   @ManyToOne(
     () => FieldOperator,
     fieldOperator => fieldOperator.captures,
-    { nullable: false },
+    { nullable: true },
   )
-  fieldOperator: FieldOperator;
+  fieldOperator: FieldOperator | null;
+
+
+  // Set only for admin manual overrides; null for operator-captured records
+  @Column({ nullable: true })
+  overriddenByUserId: string;
 
 
   @ManyToOne(
