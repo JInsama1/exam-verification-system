@@ -40,7 +40,7 @@ import {
 } from '../../database/entities/field-operator.entity';
 
 
-const MATCH_THRESHOLD        = 80;
+import { BIOMETRIC_MATCH_THRESHOLD } from '../../common/constants/biometric.constants';
 const DEVICE_ANOMALY_MINUTES = 60;
 const REPEATED_FAILURE_MIN   = 3;
 const HIGH_FAILURE_RATE      = 0.5;
@@ -96,7 +96,7 @@ export class MonitoringService {
       this.captureRepo
         .createQueryBuilder('cap')
         .where('cap.type = :type',           { type: BiometricCaptureType.VERIFICATION })
-        .andWhere('cap.matchScore >= :threshold', { threshold: MATCH_THRESHOLD })
+        .andWhere('cap.matchScore >= :threshold', { threshold: BIOMETRIC_MATCH_THRESHOLD })
         .andWhere(
           `cap."createdAt" = (
             SELECT MAX(c2."createdAt")
@@ -113,7 +113,7 @@ export class MonitoringService {
         .where('cap.type = :type', { type: BiometricCaptureType.VERIFICATION })
         .andWhere(
           '(cap.matchScore IS NULL OR cap.matchScore < :threshold)',
-          { threshold: MATCH_THRESHOLD },
+          { threshold: BIOMETRIC_MATCH_THRESHOLD },
         )
         .andWhere(
           `cap."createdAt" = (
@@ -191,7 +191,7 @@ export class MonitoringService {
         .select('cen.id', 'centerId')
         .addSelect('COUNT(cap.id)', 'total')
         .where('cap.type = :type',               { type: BiometricCaptureType.VERIFICATION })
-        .andWhere('cap.matchScore >= :threshold', { threshold: MATCH_THRESHOLD })
+        .andWhere('cap.matchScore >= :threshold', { threshold: BIOMETRIC_MATCH_THRESHOLD })
         .andWhere(
           `cap."createdAt" = (SELECT MAX(c2."createdAt") FROM biometric_captures c2 WHERE c2."candidateId" = cap."candidateId" AND c2.type = :type)`,
         )
@@ -208,7 +208,7 @@ export class MonitoringService {
         .where('cap.type = :type', { type: BiometricCaptureType.VERIFICATION })
         .andWhere(
           '(cap.matchScore IS NULL OR cap.matchScore < :threshold)',
-          { threshold: MATCH_THRESHOLD },
+          { threshold: BIOMETRIC_MATCH_THRESHOLD },
         )
         .andWhere(
           `cap."createdAt" = (SELECT MAX(c2."createdAt") FROM biometric_captures c2 WHERE c2."candidateId" = cap."candidateId" AND c2.type = :type)`,
@@ -276,7 +276,7 @@ export class MonitoringService {
         'totalVerifications',
       )
       .addSelect(
-        `SUM(CASE WHEN cap.type = '${BiometricCaptureType.VERIFICATION}' AND (cap."matchScore" IS NULL OR cap."matchScore" < ${MATCH_THRESHOLD}) THEN 1 ELSE 0 END)`,
+        `SUM(CASE WHEN cap.type = '${BiometricCaptureType.VERIFICATION}' AND (cap."matchScore" IS NULL OR cap."matchScore" < ${BIOMETRIC_MATCH_THRESHOLD}) THEN 1 ELSE 0 END)`,
         'failedVerifications',
       )
       .addSelect('MAX(cap."createdAt")', 'lastActivityAt')
@@ -332,7 +332,7 @@ export class MonitoringService {
         .where('cap.type = :type', { type: BiometricCaptureType.VERIFICATION })
         .andWhere(
           '(cap.matchScore IS NULL OR cap.matchScore < :threshold)',
-          { threshold: MATCH_THRESHOLD },
+          { threshold: BIOMETRIC_MATCH_THRESHOLD },
         )
         .groupBy('c.id')
         .addGroupBy('c.rollNumber')
@@ -357,7 +357,7 @@ export class MonitoringService {
         .addSelect('fo.phone', 'operatorPhone')
         .addSelect('COUNT(cap.id)', 'totalVerifications')
         .addSelect(
-          `SUM(CASE WHEN cap."matchScore" IS NULL OR cap."matchScore" < ${MATCH_THRESHOLD} THEN 1 ELSE 0 END)`,
+          `SUM(CASE WHEN cap."matchScore" IS NULL OR cap."matchScore" < ${BIOMETRIC_MATCH_THRESHOLD} THEN 1 ELSE 0 END)`,
           'failedVerifications',
         )
         .where('cap.type = :type', { type: BiometricCaptureType.VERIFICATION })

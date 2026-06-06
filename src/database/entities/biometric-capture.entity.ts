@@ -28,6 +28,11 @@ import {
 } from './device.entity';
 
 
+import {
+  OfflineSyncJob,
+} from './offline-sync-job.entity';
+
+
 export enum BiometricCaptureType {
   ENROLLMENT    = 'enrollment',
   VERIFICATION  = 'verification',
@@ -124,6 +129,21 @@ export class BiometricCapture {
     { nullable: true },
   )
   device: Device;
+
+
+  // Set only for captures uploaded from offline sync; null means captured online
+  @Index()
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  capturedAt: Date;
+
+
+  @Index()
+  @ManyToOne(
+    () => OfflineSyncJob,
+    syncJob => syncJob.captures,
+    { nullable: true },
+  )
+  syncJob: OfflineSyncJob;
 
 
   @Index()

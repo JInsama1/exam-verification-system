@@ -47,6 +47,8 @@ import { BiometricCapture } from './database/entities/biometric-capture.entity';
 
 import { FieldOperator } from './database/entities/field-operator.entity';
 
+import { OfflineSyncJob } from './database/entities/offline-sync-job.entity';
+
 
 
 
@@ -83,6 +85,8 @@ import { BiometricsModule } from './modules/biometrics/biometrics.module';
 import { TabletModule } from './modules/tablet/tablet.module';
 
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
+
+import { SyncModule } from './modules/sync/sync.module';
 
 
 
@@ -160,6 +164,8 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
 
         FieldOperator,
 
+        OfflineSyncJob,
+
       ],
 
     }),
@@ -216,6 +222,9 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
 
 
     MonitoringModule,
+
+
+    SyncModule,
 
 
   ],

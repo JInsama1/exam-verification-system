@@ -62,7 +62,7 @@ import {
 } from './biometric-matcher.service';
 
 
-const MATCH_THRESHOLD = 80;
+import { BIOMETRIC_MATCH_THRESHOLD } from '../../common/constants/biometric.constants';
 
 
 async function deleteFileSafe(
@@ -393,7 +393,7 @@ export class BiometricsService {
 
 
             return {
-              status:      matchScore >= MATCH_THRESHOLD
+              status:      matchScore >= BIOMETRIC_MATCH_THRESHOLD
                 ? 'VERIFIED'
                 : 'FAILED',
               matchScore,

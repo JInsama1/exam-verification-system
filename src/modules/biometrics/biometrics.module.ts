@@ -47,18 +47,8 @@ import {
 
 
 import {
-  BiometricMatcherService,
-} from './biometric-matcher.service';
-
-
-import {
-  FingerprintMatcher,
-} from './matchers/fingerprint.matcher';
-
-
-import {
-  IrisMatcher,
-} from './matchers/iris.matcher';
+  BiometricMatcherModule,
+} from './biometric-matcher.module';
 
 
 @Module({
@@ -77,6 +67,8 @@ import {
       dest: './uploads',
     }),
 
+    BiometricMatcherModule,
+
   ],
 
 
@@ -86,9 +78,6 @@ import {
 
 
   providers: [
-    FingerprintMatcher,
-    IrisMatcher,
-    BiometricMatcherService,
     BiometricsService,
   ],
 

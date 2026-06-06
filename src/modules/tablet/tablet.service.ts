@@ -39,7 +39,7 @@ import { DashboardDto } from './dto/dashboard.dto';
 import { CandidateSearchDto } from './dto/candidate-search.dto';
 
 
-const MATCH_THRESHOLD = 80;
+import { BIOMETRIC_MATCH_THRESHOLD } from '../../common/constants/biometric.constants';
 
 
 function hashToken(token: string): string {
@@ -204,8 +204,8 @@ export class TabletService {
     }
 
     const scores   = [...latestScore.values()];
-    const verified = scores.filter(s => s != null && s >= MATCH_THRESHOLD).length;
-    const failed   = scores.filter(s => s == null || s  < MATCH_THRESHOLD).length;
+    const verified = scores.filter(s => s != null && s >= BIOMETRIC_MATCH_THRESHOLD).length;
+    const failed   = scores.filter(s => s == null || s  < BIOMETRIC_MATCH_THRESHOLD).length;
 
 
     return {
@@ -271,7 +271,7 @@ export class TabletService {
     const captureVerified =
       lastVerification != null &&
       lastVerification.matchScore != null &&
-      lastVerification.matchScore >= MATCH_THRESHOLD;
+      lastVerification.matchScore >= BIOMETRIC_MATCH_THRESHOLD;
 
 
     return {

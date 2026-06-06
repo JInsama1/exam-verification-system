@@ -1,0 +1,1 @@
+export const BIOMETRIC_MATCH_THRESHOLD = 80;

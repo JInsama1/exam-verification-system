@@ -58,7 +58,7 @@ import {
 } from './dto/operator-me.dto';
 
 
-const MATCH_THRESHOLD = 80;
+import { BIOMETRIC_MATCH_THRESHOLD } from '../../common/constants/biometric.constants';
 
 
 async function deleteFileSafe(
@@ -356,7 +356,7 @@ export class FieldOperatorsService {
         .andWhere('cap.type = :type', { type: BiometricCaptureType.VERIFICATION })
         .andWhere(
           '(cap.matchScore IS NULL OR cap.matchScore < :threshold)',
-          { threshold: MATCH_THRESHOLD },
+          { threshold: BIOMETRIC_MATCH_THRESHOLD },
         )
         .getCount(),
 
