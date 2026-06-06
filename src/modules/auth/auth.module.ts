@@ -43,22 +43,27 @@ import { UsersModule } from '../users/users.module';
 
       useFactory: (
         configService: ConfigService,
-      ) => ({
+      ) => {
 
-        secret:
+        const expiresIn =
           configService.get<string>(
-            'JWT_SECRET',
-          ),
-
-
-        signOptions: {
-
-          expiresIn:
+            'JWT_EXPIRES_IN',
             '1d',
+          );
 
-        },
+        return {
 
-      }),
+          secret:
+            configService.get<string>(
+              'JWT_SECRET',
+            ),
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          signOptions: { expiresIn: expiresIn as any },
+
+        };
+
+      },
 
     }),
 

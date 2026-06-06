@@ -33,13 +33,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const payload =
-        await this.jwtService.verifyAsync(
-          token,
-          {
-            secret:
-              'exam_verification_super_secret_2026',
-          },
-        );
+        await this.jwtService.verifyAsync(token);
 
       request.user = payload;
 

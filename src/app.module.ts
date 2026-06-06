@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -16,7 +16,9 @@ import {
 
 
 
-import { databaseConfig } from './config/database.config';
+import { getDatabaseConfig } from './config/database.config';
+
+import { envValidationSchema } from './config/env.validation';
 
 
 import { User } from './database/entities/user.entity';
@@ -100,6 +102,8 @@ import { SyncModule } from './modules/sync/sync.module';
 
       isGlobal: true,
 
+      validationSchema: envValidationSchema,
+
     }),
 
 
@@ -129,12 +133,18 @@ import { SyncModule } from './modules/sync/sync.module';
 
 
 
-    TypeOrmModule.forRoot({
+    TypeOrmModule.forRootAsync({
 
-      ...databaseConfig,
+      imports: [ConfigModule],
+
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => ({
+
+        ...getDatabaseConfig(configService),
 
 
-      entities: [
+        entities: [
 
         User,
 
@@ -167,6 +177,8 @@ import { SyncModule } from './modules/sync/sync.module';
         OfflineSyncJob,
 
       ],
+
+      }),
 
     }),
 
